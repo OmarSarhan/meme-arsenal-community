@@ -1,0 +1,193 @@
+Later private documentation addendum — 2026-11-02
+The introductory pending guide/UI wording below is historical. Accepted later
+bounded private guide/UI and recovery evidence is indexed in
+../../docs/release-preparation.md, including OMA41's independent reader and new
+mapped installed-candidate evidence. No public release is authorized.
+
+OMA-20 implementation verification — 2026-11-02
+
+Later release-preparation pointer (2026-11-02)
+The records below preserve their original tested identities and pending wording
+as historical evidence. See ../../docs/release-preparation.md for accepted later
+guide/readiness, full restore/worker and development-schema results, plus focused
+guide/UI checks still pending CI. Private development CI URLs are provenance;
+the linked summary gives public-readable results and limits without raw logs.
+
+Current status: parent-supplied final OMA-20 evidence reports all four checks
+passed at 8cc8c501, merged as 33e7e49. Community run
+https://github.com/OmarSarhan/meme-arsenal-oss/actions/runs/41374887664 and standard
+run https://github.com/OmarSarhan/meme-arsenal-oss/actions/runs/41374887668 include
+the reserved import username correction.
+This ingress evidence does not complete the other release gates below.
+
+OMA-19 bootstrap implementation — offline evidence
+Research's nine isolated pre-fix probes confirmed missing/empty assets reached
+the child, copy failure emptied old dist, and default/YAML/_FILE paths disagreed.
+Focused bootstrap/config/community regressions now cover staged installation,
+repeat replacement, stale hidden assets, non-generated sentinels, missing/empty/
+unreadable index, injected copy/config/publication failure and restoration,
+settings normalization/precedence and actual shell migration/exec ordering.
+These use disposable directories and stub commands, not a running image.
+The existing single-build community smoke now asserts Alembic head at seed and
+recreation and exercises missing assets/index, staged configuration failure and
+migration failure through actual entrypoints in disposable one-offs. Reserve
+checksums must survive faults; existing seeded rows/media/session/config checks
+remain. This new runtime extension is pending CI; no local image build was run.
+
+Parent CI and review follow-up
+- Community run https://github.com/OmarSarhan/meme-arsenal-oss/actions/runs/41374362327
+  passed the complete checks listed below at 3de8d763: real image build, Caddy
+  config validation, verified HTTPS/auth/Origin boundaries, private runtime ports,
+  Uvicorn IP/scheme proofs, uploads/media/jobs, recreation and credential reload.
+- The initial CI topology assertion failed because Compose omits false booleans
+  inside normalized bind options. The corrected assertion was checked offline
+  against real base/fixture configs and an unsafe auto-create bind; the latter
+  still fails. No deployment bind policy changed.
+- Independent review found one startup failure: bare import as an account name
+  is processed as a Caddyfile directive. Initialization now rejects it before
+  creating any paths. The focused regression failed before this correction.
+  All 59 initializer/preflight cases passed afterward in 0.31 seconds with
+  isolated temporary settings and sockets blocked; targeted Ruff/diff checks
+  passed. No local Caddy runtime test was added for this rejected input.
+  Pinned parser source:
+  https://github.com/caddyserver/caddy/blob/v2.11.7/caddyconfig/caddyfile/parse.go
+
+Checks actually run for OMA-20
+- Source base 34707a07ceef45e741da0c8716a2016a4ab008d5; Linux amd64.
+- Offline tests/test_community_deploy.py: 58 passed. New origin/username/hash
+  validation, literal bcrypt dollars, canonical origin rendering, private modes,
+  no overwrite and redacted failures, plus all existing preflight checks.
+- Two existing offline API regressions passed: upload_to_remix_and_save_draft
+  and ready_remix_job_saves_only_when_requested (24 other cases deselected).
+  These use temporary SQLite/media and mock processing, not Caddy or PostgreSQL.
+- Ruff passed on initializer, smoke driver and community tests; embedded Python
+  smoke programs compiled; git diff --check passed.
+- Tests ran from an isolated temporary cwd/HOME with cleared inherited env,
+  source src first on PYTHONPATH, no bytecode/cache writes to the tooling venv.
+  Available tooling: FastAPI 0.139.0, Uvicorn 0.50.2, Pillow 12.3.0,
+  SQLAlchemy 2.0.51, pytest 9.1.1, Ruff 0.15.20. These differ from the target
+  dependency constraints; the installed target Uvicorn trust proof belongs to CI.
+- No local Docker activity, full-image builds, package installs, service changes,
+  real configuration/secrets/data, provider or Telegram calls were used.
+
+Pinned Caddy provenance (primary registry and upstream source, checked 2026-11-02)
+- Official image: caddy:2.11.7-alpine
+  Index digest: sha256:e70b164da81ef698b3ad19af799ea6086ce6d9e48ed4079eb9fe26f6fbf14ee5
+  Linux amd64 manifest: sha256:04913b1da43339a40ad1ea87827d70a576ac5aa6cf674c6e24fdca675887533a
+  Image config: sha256:3067cc4e02c091399edbd5d65f85a3ff4d511574aecadb47f280c3761e68852e
+- Read manifests/config through registry-1.docker.io/v2/library/caddy, hashed
+  returned manifest bytes, and verified the selected architecture/config. Config
+  User is empty (root UID:GID 0:0), Cmd explicitly runs /etc/caddy/Caddyfile,
+  XDG_DATA_HOME=/data, XDG_CONFIG_HOME=/config. Runtime id is also asserted by CI.
+- Official source entry:
+  https://github.com/docker-library/official-images/blob/master/library/caddy
+  Its pinned Dockerfile has no USER override:
+  https://github.com/caddyserver/caddy-docker/blob/9234f5785658cae8129bfae366e196d0670468ac/2.11/alpine/Dockerfile
+- Hash-command semantics verified in the pinned source: terminal input prompts
+  twice with term.ReadPassword; non-TTY input consumes one newline-terminated
+  password from stdin; stdout contains the hash. Docker PTY merges prompt output,
+  so the README copies only the hash instead of redirecting a PTY transcript.
+  https://github.com/caddyserver/caddy/blob/v2.11.7/modules/caddyhttp/caddyauth/command.go
+  https://caddyserver.com/docs/command-line#caddy-hash-password
+- Directive/matcher/header semantics consulted:
+  https://caddyserver.com/docs/caddyfile/directives/basic_auth
+  https://caddyserver.com/docs/caddyfile/matchers
+  https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#headers
+
+CI acceptance passed at the snapshot above, not executed locally
+- One existing community job/build: base and offline effective topology, runtime
+  PortBindings, parsed caddy adapt --validate handler order/headers, real verified
+  HTTPS with only fixture CA trust, dashboard/JS/config, API, upload/save, private
+  media GET/HEAD/Range, seeded ready-job detail/image/card, schema/share/private
+  tree/SPA fallback, representative wrong Basic/cookie-only/spoofed reads/writes.
+- Foreign/null Origin multipart upload with valid Basic and no cookie must return
+  403 without session/media/classification/file changes; unauthenticated remains
+  401. Same-origin and absent-Origin uploads succeed; foreign-Origin save denied.
+- Real session IP HMAC must match the actual HTTPS client socket's source, not
+  forged XFF or Caddy's address. Separate worker-to-app non-loopback probe proves
+  installed Uvicorn scheme handling with XFP=https ->403 versus http ->404.
+  Stripped-header bytes are parsed configuration evidence, not packet capture.
+- Full recreation includes Caddy, old-cookie private media/job access, saved DB
+  metadata, Redis key, unchanged signing key and fixture CA; missing credential
+  import must fail reload while old configuration remains authenticated.
+- Host-mismatch case is narrow; no universal strict SNI-enforcement claim.
+  No public ACME, real provider/Telegram, video decode, durable identity (OMA-22),
+  public sharing policy (OMA-23) or backup/restore acceptance is implied.
+
+Historical OMA-18 implementation verification — 2026-11-02
+
+Scope and environment
+- Source base 6d55fbddaa771ee4f7c18e7999f9fcbb5ffa49b8; Linux amd64.
+- Docker Engine 29.1.3, Compose 2.40.3+ds1-0ubuntu1.
+- Every Compose command used a unique disposable project, this recipe,
+  an explicit temporary env file and a unique attempted image tag.
+  Temporary binds/config lived outside source checkouts.
+- Synthetic secrets, AI_PROVIDER=mock, no Telegram files or credentials.
+  No host ports, external networks, production configuration or live data used.
+  No provider/Telegram/mail calls. The image build fetched package dependencies.
+
+Passed
+- tests/test_community_deploy.py: 11 passed. Covers new-instance-only setup,
+  outside-checkout paths, private modes, matching DB credentials, persistent
+  signing material, upload-first validation, missing required/optional files,
+  safe error messages, provider key requirements, explicit sync credential/login
+  gating. Container reserve existence/access is mocked in these unit tests.
+- Ruff on init.py, community-entrypoint.py and test_community_deploy.py; diff check.
+  Host tests used the existing read-only tooling venv, OSS src first on PYTHONPATH,
+  empty inherited environment, a temporary working directory and no pytest cache.
+- Compose config --quiet and parsed config --format json: default services are
+  app/worker/db/redis only; --profile telegram includes sync. No published ports
+  or external networks. All services have 10m/3 json-file logs. Explicit binds
+  refuse automatic directory creation. No Telegram secret file needed to resolve.
+- Missing instance configuration, missing app.env, and a real Compose run with
+  a nonexistent Redis bind directory all failed. Missing storage was not created.
+- up -d --no-build --wait --wait-timeout 60 db redis: both healthy using the pinned
+  images. Container inspection confirmed no host port bindings. Runtime image
+  users were postgres 999:999 and redis 999:1000.
+- Inserted a deterministic PostgreSQL row and Redis key; Redis reported
+  appendonly=yes. After up -d --no-build --force-recreate --wait db redis,
+  both values remained intact. Data binds were temporary directories.
+- Using the existing Python tooling, Alembic upgrade head ran all migrations
+  through 012_public_share_codes on that disposable PostgreSQL. The connection
+  targeted only its inspected project-local IP; no published DB port.
+- An in-process FastAPI TestClient with production settings, HTTPS test origin,
+  secure cookies, temporary reserve, mock AI and those disposable DB/Redis IPs
+  returned 200 for /api/health and a generated 32x32 PNG POST to
+  /api/remix/uploads (origin dashboard_upload). No Telegram credentials existed.
+  This exercises source code, not the built image or Compose app entrypoint.
+
+Later CI evidence (supplied from PR #5; not rerun during publication cleanup)
+- At 91ab9c39229dbbd083253cc4d669ab41fffcb956 all four PR checks passed.
+  Community CI: https://github.com/OmarSarhan/meme-arsenal-oss/actions/runs/41369398232
+  built/booted app, worker, DB and Redis without Telegram, checked the dashboard,
+  assets and mock upload, recreated all four core containers, and verified
+  media/DB/session plus Redis persistence before removing its resources.
+- Standard CI: https://github.com/OmarSarhan/meme-arsenal-oss/actions/runs/41369398226
+  passed backend/frontend checks and 24 browser cases with zero skips.
+  Independent PR #5 review reported no actionable findings.
+
+Earlier limitations and remaining follow-up gates
+- One source-image build was attempted with this recipe's app target. It completed
+  frontend compilation, dependency installation and Dockerfile steps, but was
+  canceled during image export because local disk capacity was insufficient.
+  No output image tag was created locally. No second local build was attempted.
+- Community CI run 41368513371 built the image and started all four core services
+  healthy. Its HTTP probe then failed on a test-only httpx import absent from the
+  runtime image. The corrected probe uses Python's standard library; the later
+  successful run above supersedes that missing core-smoke evidence. Sync runtime
+  remains deliberately unverified.
+- OMA-19 still owns reproducible image/bootstrap/frontend acceptance, even though
+  this disposable PostgreSQL migration probe succeeded.
+- At that historical baseline OMA-20 ingress was unimplemented. Current OMA-20
+  status is above. OMA-22 identity, opt-in sharing and backup/restore remain gates.
+- No Telegram login/sync or real AI-provider test was attempted deliberately.
+
+Cleanup
+- Scoped compose --profile telegram down --remove-orphans removed the test
+  containers/network; project-label queries returned no containers or networks.
+- No app image tag, server, watcher or daemon was left by the test.
+- Removed 23 newly-created, unshared cache records from the canceled build by
+  their exact cache IDs (verified individually); no global prune. Host free disk
+  was recovered. Pre-existing/shared Docker resources were untouched.
+- Shared package-cache mounts were retained.
+  No runtime instance data/config/secrets were retained.

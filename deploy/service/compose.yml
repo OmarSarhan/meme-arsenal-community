@@ -1,0 +1,219 @@
+name: meme-arsenal
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: app
+    restart: unless-stopped
+    env_file:
+      - path: ${SERVICE_ENV_FILE:-./env.production}
+        required: true
+    environment:
+      RESERVE_PATH: /reserve
+      DATABASE_URL_FILE: /run/secrets/database_url
+      REDIS_URL: redis://redis:6379/0
+      GEMINI_API_KEY_FILE: /run/secrets/gemini_api_key
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+      TELEGRAM_API_ID_FILE: /run/secrets/telegram_api_id
+      TELEGRAM_API_HASH_FILE: /run/secrets/telegram_api_hash
+      PUBLIC_SESSION_SECRET_FILE: /run/secrets/public_session_secret
+      ARSENAL_INSTALL_DASHBOARD: "1"
+    command: sh -c "alembic upgrade head && arsenal serve-online --host 0.0.0.0 --port 8000"
+    volumes:
+      - type: bind
+        source: ${RESERVE_HOST_PATH:-../../state/reserve}
+        target: /reserve
+        bind:
+          create_host_path: false
+    secrets:
+      - database_url
+      - gemini_api_key
+      - openai_api_key
+      - telegram_api_id
+      - telegram_api_hash
+      - public_session_secret
+    expose:
+      - "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/api/health >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      edge:
+        aliases:
+          - meme-arsenal-app
+      private:
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: app
+    restart: unless-stopped
+    env_file:
+      - path: ${SERVICE_ENV_FILE:-./env.production}
+        required: true
+    environment:
+      RESERVE_PATH: /reserve
+      DATABASE_URL_FILE: /run/secrets/database_url
+      REDIS_URL: redis://redis:6379/0
+      GEMINI_API_KEY_FILE: /run/secrets/gemini_api_key
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+      TELEGRAM_API_ID_FILE: /run/secrets/telegram_api_id
+      TELEGRAM_API_HASH_FILE: /run/secrets/telegram_api_hash
+      PUBLIC_SESSION_SECRET_FILE: /run/secrets/public_session_secret
+    command: arsenal online-worker
+    volumes:
+      - type: bind
+        source: ${RESERVE_HOST_PATH:-../../state/reserve}
+        target: /reserve
+        bind:
+          create_host_path: false
+    secrets:
+      - database_url
+      - gemini_api_key
+      - openai_api_key
+      - telegram_api_id
+      - telegram_api_hash
+      - public_session_secret
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      egress:
+      private:
+
+  sync:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: app
+    restart: unless-stopped
+    env_file:
+      - path: ${SERVICE_ENV_FILE:-./env.production}
+        required: true
+    environment:
+      RESERVE_PATH: /reserve
+      DATABASE_URL_FILE: /run/secrets/database_url
+      REDIS_URL: redis://redis:6379/0
+      GEMINI_API_KEY_FILE: /run/secrets/gemini_api_key
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
+      TELEGRAM_API_ID_FILE: /run/secrets/telegram_api_id
+      TELEGRAM_API_HASH_FILE: /run/secrets/telegram_api_hash
+      PUBLIC_SESSION_SECRET_FILE: /run/secrets/public_session_secret
+    command: >
+      sh -c 'sleep "$${SYNC_START_DELAY_SECONDS:-30}";
+      while true; do
+        if arsenal sync-online; then
+          date -u +%FT%TZ > /tmp/sync-ok;
+          rm -f /tmp/sync-failed;
+        else
+          rm -f /tmp/sync-ok;
+          date -u +%FT%TZ > /tmp/sync-failed;
+        fi;
+        sleep "$${SYNC_INTERVAL_SECONDS:-1200}";
+      done'
+    volumes:
+      - type: bind
+        source: ${RESERVE_HOST_PATH:-../../state/reserve}
+        target: /reserve
+        bind:
+          create_host_path: false
+    secrets:
+      - database_url
+      - gemini_api_key
+      - openai_api_key
+      - telegram_api_id
+      - telegram_api_hash
+      - public_session_secret
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/sync-ok && find /tmp/sync-ok -mmin -45 -print -quit | grep -q ."]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10m
+    networks:
+      egress:
+      private:
+
+  db:
+    image: pgvector/pgvector:pg16@sha256:7b822b0aac60967beb1ea5e576b8602c94c300a157d187f385ae3e0da199b90a
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-meme_arsenal}
+      POSTGRES_USER: ${POSTGRES_USER:-meme_arsenal}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    volumes:
+      - type: bind
+        source: ${POSTGRES_DATA_HOST_PATH:-../../state/postgres-data}
+        target: /var/lib/postgresql/data
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-meme_arsenal} -d $${POSTGRES_DB:-meme_arsenal}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      private:
+
+  redis:
+    image: redis:7-alpine@sha256:57e4255cc971b1c8d6f8a6ca283ac01bc3ecdd914273ef6bfaede87aaecd6541
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - type: bind
+        source: ${REDIS_DATA_HOST_PATH:-../../state/redis-data}
+        target: /data
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      private:
+
+networks:
+  edge:
+    external: true
+  private:
+    internal: true
+  egress:
+
+volumes:
+  postgres_data:
+    name: meme_arsenal_postgres_data
+  redis_data:
+    name: meme_arsenal_redis_data
+
+secrets:
+  database_url:
+    file: ${SERVICE_SECRETS_DIR:?Set an absolute operator-owned secrets directory}/database_url
+  postgres_password:
+    file: ${SERVICE_SECRETS_DIR:?Set an absolute operator-owned secrets directory}/postgres_password
+  gemini_api_key:
+    file: ${SERVICE_SECRETS_DIR:?Set an absolute operator-owned secrets directory}/gemini_api_key
+  openai_api_key:
+    file: ${SERVICE_SECRETS_DIR:?Set an absolute operator-owned secrets directory}/openai_api_key
+  telegram_api_id:
+    file: ${SERVICE_SECRETS_DIR:?Set an absolute operator-owned secrets directory}/telegram_api_id
+  telegram_api_hash:
+    file: ${SERVICE_SECRETS_DIR:?Set an absolute operator-owned secrets directory}/telegram_api_hash
+  public_session_secret:
+    file: ${SERVICE_SECRETS_DIR:?Set an absolute operator-owned secrets directory}/public_session_secret

@@ -1,0 +1,28 @@
+reserve_path: ./meme-arsenal-reserve
+database_url: sqlite:///./meme-arsenal-reserve/data/arsenal.sqlite
+ai_provider: mock
+# Null/blank inherits ai_provider; no automatic model or dimension changes.
+classification_provider: null
+classification_style_guidance: ""
+remix_style_guidance: ""
+embedding_provider: null
+remix_provider: null
+ai_model: gpt-5-mini
+embedding_model: text-embedding-3-small
+embedding_dimensions: 1536
+classification_prompt_version: v1
+remix_model: gemini-3.1-flash-image
+remix_aspect_ratio: "1:1"
+remix_image_size: 1K
+remix_include_video_original: true
+remix_video_inline_max_mb: 20
+ai_request_delay_seconds:
+ai_max_retries: 3
+ai_max_retry_delay_seconds: 90
+ai_stop_on_rate_limit: true
+ai_include_video_original: true
+ai_video_inline_max_mb: 20
+import_batch_size: 100
+import_delay_seconds: 0.35
+max_video_keyframes: 8
+semantic_search_top_k: 25

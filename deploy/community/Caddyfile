@@ -1,0 +1,27 @@
+{
+	admin localhost:2019
+}
+
+https://SITE_AUTHORITY {
+	@foreign_origin {
+		not method GET HEAD OPTIONS
+		header Origin *
+		not header Origin https://SITE_AUTHORITY
+	}
+	route {
+		basic_auth {
+			import /etc/caddy/owner.caddy
+		}
+		respond @foreign_origin 403
+		reverse_proxy app:8000 {
+			header_up Host SITE_AUTHORITY
+			header_up X-Forwarded-Host SITE_AUTHORITY
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-For {remote_host}
+			header_up -Forwarded
+			header_up -X-Forwarded-Prefix
+			header_up -X-Real-IP
+			header_up -Authorization
+		}
+	}
+}

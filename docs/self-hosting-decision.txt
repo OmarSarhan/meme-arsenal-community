@@ -1,0 +1,126 @@
+Self-hosting deployment decision
+
+Status (2026-11-02): portable recipe and bounded runtime verification accepted
+privately; see release-preparation.md for evidence and remaining release gates.
+Install using deploy/community/README.md. The design baseline below is retained.
+Scope: one individual operating a private meme library, with optional sharing and
+Telegram sync. Evidence baseline: OSS aea362783794e87ac3ea4a50a236f26e17233901.
+
+Platform, services and startup
+
+The first target is Linux amd64 with Docker Engine and Compose v2, built from a
+declared source checkout. Record the tested Engine/Compose versions with the
+release. Other platforms, published images, Kubernetes and SQLite parity are not
+part of this initial support claim.
+
+Use the existing Dockerfile's app target for the API/dashboard, one worker and
+optional sync. It builds the React dashboard with Node 22/npm ci and installs
+Python 3.12 and media tools. Keep PostgreSQL 16 with pgvector and Redis 7 with AOF.
+Use project-local networks, with no external edge network prerequisite. Only the
+authenticated HTTPS ingress publishes browser ports; app, database and Redis
+ports stay unpublished. Configured integrations need outbound access.
+
+Every application process explicitly receives RESERVE_PATH=/reserve. Install the
+image's frontend into /reserve/dashboard/dist with online API configuration, run
+alembic upgrade head before serving, and start worker/sync after app readiness.
+Initialization must fail visibly when required assets or configuration are absent.
+Replace only generated dashboard assets on upgrade; preserve the rest of reserve.
+Do not build the frontend at service startup. The current API health check covers
+DB/Redis, so it cannot alone prove that frontend installation succeeded.
+
+Storage and configuration
+
+Keep persistent state and local configuration outside the checkout/build context.
+Use operator-chosen absolute paths; the generic layout is:
+  <instance>/state/reserve       -> /reserve
+  <instance>/state/postgres-data -> /var/lib/postgresql/data
+  <instance>/state/redis-data    -> /data
+  <instance>/state/proxy         -> ingress certificates/state
+  <instance>/config and <instance>/secrets -> protected operator configuration
+  <backup-root>                 -> separate destination outside reserve
+
+Retain explicit reserve/PostgreSQL/Redis bind paths and create_host_path:false.
+Initialization creates required directories deliberately and documents ownership
+for each image's user. Do not rely on world-writable permissions. Missing storage
+must prevent serving. If a directory is on a separate disk, the operator must
+also ensure the mount is present; directory existence does not prove that.
+Keep the complete reserve, including originals, drafts and any Telegram session.
+
+Use existing *_FILE configuration support with validation for required secrets.
+Errors must identify missing configuration without printing its values. A clean
+source build must not contain real configuration, secret files or library data.
+
+Private access and optional integrations
+
+Supply Caddy HTTPS ingress with one operator-configured Basic Auth identity.
+Require APP_ENV=production, an HTTPS PUBLIC_SITE_URL, secure cookies and a
+persistent non-default PUBLIC_SESSION_SECRET of at least 32 characters. Protect
+all dashboard, API, upload, job-image and raw-media routes, with no bypass port
+or unauthenticated static alias. Strip/replace untrusted forwarded headers and
+scope proxy-header trust to the documented isolated proxy topology.
+
+Anonymous browser sessions currently identify drafts; they do not authenticate
+the owner. Durable owner identity, migration and cookie/signing-key recovery need
+their own implementation and tests. Ingress authentication is the private boundary.
+
+Upload-first is the default. Gate Telegram sync behind an explicit Compose
+profile, with no mandatory Telegram credentials or secret files for app/worker.
+Enabling sync requires deliberate interactive login using the same persistent
+reserve, then the existing sync-online loop. Never log in during service boot.
+Retain sync failure/health visibility and align its stale threshold with polling.
+Keep the existing AI_PROVIDER contract initially; mock is a fixture mode and
+does not provide working remix generation.
+
+Leave PUBLIC_SHARE_URL empty and expose no share hostname by default. Empty
+configuration alone does not disable today's sharing feature: implement the
+explicit opt-in behavior before release. An enabled separate share hostname
+must use a share-only route allowlist, never unrestricted app proxying.
+
+Selected upstream changes
+
+The OSS seed already contains the operations files at upstream
+9620f2b5c4d3c23956eed9f37735594d1acb5688. Adopt generic behavior individually;
+do not import production paths, domains, control-plane files or live data.
+
+- 24adb2da8349afa82ca572a1927c5f68d95f92c7, newer than the seed: adopt bounded
+  json-file container logs (10 MiB, three files) in the portable Compose recipe.
+  Adopt backup destination-capacity preflight separately: apparent reserve bytes
+  plus 1 GiB headroom. This is a lower-bound guard, not a promise that a large DB
+  dump or concurrent writes will fit. Keep generic storage/retention principles
+  from STORAGE.md, excluding its host inventory and operational migration steps.
+- 3a27b55f47b754b2f13f681a427f55c50b13f56b and
+  7dd88cf02443ed0b482ee9562cd2191787b50b62, already seeded: retain explicit DB/Redis
+  bind locations and missing-directory refusal. Replace host-specific storage
+  configuration and backup defaults in the community recipe.
+- a4d8903af76d7d725992c63c02f4325bcad332db, already seeded: retain sync failure
+  health markers and backup path resolution, custom-format pg_dump, output
+  listing validation, cleanup, checksums, restricted permissions and opt-in
+  retention. These do not prove backup consistency or successful restoration.
+- 5017abac003ad84986076f44e6a60c06bc913744, already seeded: retain removal of stale
+  generated frontend assets before installing the image's dashboard.
+
+Backup and release boundaries
+
+The current backup script dumps the DB then archives reserve while writers may
+run. The capacity preflight does not fix that consistency gap. The supported
+procedure must record prior process state, quiesce app/worker/enabled sync and
+operator CLI writers, verify they stopped, then capture DB and complete reserve.
+Keep PostgreSQL available for pg_dump. Resume only previously running services
+on success or failure, or provide an explicit safe recovery command.
+
+Include required signing/auth/Telegram material as separately protected backup
+contents. The success manifest records component identities/references and
+validation results, never secret values. Publish it only after all required
+components and checksums validate. Use restrictive permissions from temporary
+file creation. Missing reserve fails a full backup; label explicit DB-only output
+incomplete. Retention deletion remains opt-in, and backup never deletes live state.
+
+PostgreSQL jobs are authoritative; the worker also polls DB when Redis is empty.
+Prefer fresh Redis on disaster restore, with pending-job recovery verified and
+reset rate-limit counters documented. Restore to an empty instance and prove one
+declared upgrade path before release. export-catalog is not a recovery backup.
+
+Portable configuration/storage ownership, bootstrap, ingress, durable ownership,
+opt-in sharing, consistent backup and restore/upgrade tests remain implementation
+gates. This decision used committed source comparisons and shell syntax checks;
+it does not claim a container boot, backup/restore or production runtime test.

@@ -1,0 +1,175 @@
+# Only the authenticated HTTPS ingress publishes host ports.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-environment: &environment
+  APP_ENV: production
+  RESERVE_PATH: /reserve
+  DATABASE_URL_FILE: /run/secrets/database_url
+  REDIS_URL: redis://redis:6379/0
+  PUBLIC_SESSION_SECRET_FILE: /run/secrets/public_session_secret
+  OWNER_SESSION_ID_FILE: /run/secrets/owner_session_id
+  PUBLIC_SESSION_COOKIE_SECURE: "true"
+  PUBLIC_TRUST_PROXY_HEADERS: "false"
+
+x-application: &application
+  image: ${ARSENAL_IMAGE:?Set ARSENAL_IMAGE to your source-built image tag}
+  build:
+    context: ../..
+    target: app
+  restart: unless-stopped
+  logging: *logging
+  env_file:
+    - path: ${ARSENAL_INSTANCE:?Run deploy/community/init.py first}/config/app.env
+      required: true
+      format: raw
+  environment: *environment
+  entrypoint: ["python", "/usr/local/bin/community-entrypoint.py"]
+  volumes:
+    - type: bind
+      source: ${ARSENAL_INSTANCE}/state/reserve
+      target: /reserve
+      bind:
+        create_host_path: false
+    - type: bind
+      source: ${ARSENAL_INSTANCE}/secrets
+      target: /run/secrets
+      read_only: true
+      bind:
+        create_host_path: false
+  networks:
+    - private
+    - egress
+
+services:
+  caddy:
+    image: caddy:2.11.7-alpine@sha256:e70b164da81ef698b3ad19af799ea6086ce6d9e48ed4079eb9fe26f6fbf14ee5
+    restart: unless-stopped
+    logging: *logging
+    command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
+    ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
+    volumes:
+      - type: bind
+        source: ${ARSENAL_INSTANCE}/config/ingress
+        target: /etc/caddy
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${ARSENAL_INSTANCE}/state/proxy/data
+        target: /data
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${ARSENAL_INSTANCE}/state/proxy/config
+        target: /config
+        bind:
+          create_host_path: false
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [egress]
+
+  app:
+    <<: *application
+    environment:
+      <<: *environment
+      ARSENAL_INSTALL_DASHBOARD: "1"
+      ARSENAL_COMMUNITY_DRAIN: "1"
+      # All host/project peers are trusted; raw app ports must stay unpublished.
+      FORWARDED_ALLOW_IPS: "*"
+    command: ["sh", "-c", "alembic upgrade head && exec arsenal serve-online --host 0.0.0.0 --port 8000"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  worker:
+    <<: *application
+    command: ["arsenal", "online-worker"]
+    depends_on:
+      app:
+        condition: service_healthy
+
+  sync:
+    <<: *application
+    profiles: ["telegram"]
+    environment:
+      <<: *environment
+      TELEGRAM_API_ID_FILE: /run/secrets/telegram_api_id
+      TELEGRAM_API_HASH_FILE: /run/secrets/telegram_api_hash
+      ARSENAL_TELEGRAM_SYNC: "1"
+    # Fixed 20-minute polling; 45-minute health window includes one poll's work.
+    # No interactive login during boot, even if a saved session has expired.
+    command: ["sh", "/usr/local/bin/community-sync.sh"]
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/sync-ok && find /tmp/sync-ok -mmin -45 -print -quit | grep -q ."]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10m
+
+  db:
+    image: pgvector/pgvector:pg16@sha256:7b822b0aac60967beb1ea5e576b8602c94c300a157d187f385ae3e0da199b90a
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      POSTGRES_DB: meme_arsenal
+      POSTGRES_USER: meme_arsenal
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    volumes:
+      - type: bind
+        source: ${ARSENAL_INSTANCE}/state/postgres-data
+        target: /var/lib/postgresql/data
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${ARSENAL_INSTANCE}/secrets/postgres_password
+        target: /run/secrets/postgres_password
+        read_only: true
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meme_arsenal -d meme_arsenal"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks: [private]
+
+  redis:
+    image: redis:7-alpine@sha256:57e4255cc971b1c8d6f8a6ca283ac01bc3ecdd914273ef6bfaede87aaecd6541
+    restart: unless-stopped
+    logging: *logging
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - type: bind
+        source: ${ARSENAL_INSTANCE}/state/redis-data
+        target: /data
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks: [private]
+
+networks:
+  private:
+    internal: true
+  egress: {}

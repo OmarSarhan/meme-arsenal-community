@@ -1,0 +1,54 @@
+name: Community private ingress
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/community.yml'
+      - '.dockerignore'
+      - 'Dockerfile'
+      - 'pyproject.toml'
+      - 'deploy/community/**'
+      - 'docker/community-entrypoint.py'
+      - 'docker/online-entrypoint.sh'
+      - 'docker/community-sync.sh'
+      - 'src/meme_arsenal/drain.py'
+      - 'src/meme_arsenal/online_worker.py'
+      - 'src/meme_arsenal/owner.py'
+      - 'tests/test_owner.py'
+      - 'scripts/backup_community.py'
+      - 'scripts/restore_community.py'
+      - 'tests/test_service_restore.py'
+      - 'tests/test_service_backup.py'
+      - 'tests/test_drain.py'
+      - 'tests/test_online_worker.py'
+      - 'migrations/**'
+      - 'src/meme_arsenal/config.py'
+      - 'src/meme_arsenal/bootstrap.py'
+      - 'src/meme_arsenal/online.py'
+      - 'src/meme_arsenal/cli.py'
+      - 'src/meme_arsenal/dashboard.py'
+      - 'frontend/dashboard/**'
+      - 'tests/test_community_deploy.py'
+      - 'tests/test_bootstrap.py'
+      - 'tests/test_online_api.py'
+      - 'scripts/verify_community.py'
+      - 'scripts/community_guide.py'
+      - 'scripts/community_ui.py'
+      - 'docker/test-chromium.Dockerfile'
+      - 'scripts/oma30_fixture.py'
+      - 'scripts/oma30_upgrade.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  community:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: docker compose version
+      - run: docker version
+      # Root can remove fixture bind data owned by the database/container users.
+      - run: sudo python3 scripts/verify_community.py

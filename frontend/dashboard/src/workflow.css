@@ -1,0 +1,1290 @@
+/* Page navigation and staged remix workflow. Slider visuals remain in styles.css. */
+.destinationNav {
+  position: fixed;
+  inset: auto 0 0;
+  width: 100%;
+  transform: none;
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  padding: 0 0 env(safe-area-inset-bottom);
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--panel-flat);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.destinationNav button {
+  width: min(50%, 260px);
+  min-height: 60px;
+  border: 0;
+  border-top: 3px solid transparent;
+  border-radius: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0;
+}
+.destinationNav button.active,
+.destinationNav .remixActive.active {
+  border-color: #287958;
+  color: #1d6346;
+  background: #e6f3eb;
+  box-shadow: none;
+}
+.searchCluster {
+  grid-template-columns: minmax(180px, 20vw) auto;
+}
+.itemCard { contain-intrinsic-size: auto 370px; }
+.includeHiddenToggle { white-space: nowrap; gap: 5px; }
+.includeHiddenToggle input { width: 16px; height: 16px; margin: 0; }
+.itemCard { box-shadow: none; display: flex; flex-direction: column; }
+.itemCardMain { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.itemCardMain > .mediaPreview { flex: none; }
+.itemCardMain > .itemDetailButton { flex: 1; }
+.itemCard.is-hidden .itemBody {
+  background: repeating-linear-gradient(135deg, transparent 0 7px, rgb(48 102 79 / 0.075) 7px 10px);
+}
+.hiddenIndicator { display: inline-flex; align-items: center; gap: 3px; }
+.remixCorner { width: 40px; height: 40px; padding: 0; display: block; font-size: 0.85rem; }
+.remixCornerA { background: #c63550; }
+.remixCornerB { background: #238153; }
+.remixCorner span { position: absolute; top: 5px; }
+.remixCornerA span { left: 6px; }
+.remixCornerB span { right: 6px; }
+.cardRemixActions {
+  display: flex;
+  flex: none;
+  margin-top: auto;
+  background: var(--panel-flat);
+  border-top: 1px solid var(--border);
+  min-height: 40px;
+}
+.cardRemixActions button {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.cardRemixActions button + button { border-left: 1px solid var(--border); }
+.cardRemixActions button:hover { background: #e6f3eb; }
+.cardRemixActions button:disabled { opacity: 0.45; cursor: default; }
+.appShell.isRemixOpen .remixPane {
+  position: relative;
+  top: auto;
+  width: min(72%, 1080px);
+  margin: 0 auto;
+  overflow: visible;
+  will-change: auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none !important;
+  background: transparent;
+}
+.appShell.isRemixOpen .remixPane::before { display: none; }
+.remixWorkspace {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0;
+  gap: 10px;
+}
+.remixCenter {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+.remixActionGroup { display: flex; justify-content: center; gap: 8px; }
+.remixActionGroup button { flex: 0 1 180px; }
+.remixSlot { grid-template-rows: auto auto; gap: 5px; }
+.remixSlotHeader { position: relative; flex-wrap: wrap; }
+.remixSlotHeader strong { color: #c63550; }
+.remixSlot[aria-label="B"] .remixSlotHeader strong { color: #238153; }
+.remixSlotActions { gap: 2px; }
+.remixSlotActions .compactAction,
+.remixSlotActions .remixRandomAction,
+.remixSlotActions .randomScopeToggle {
+  width: 34px;
+  min-width: 34px;
+  min-height: 36px;
+  padding: 0;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+.blockNotice .classificationRetry { flex: 0 0 36px; width: 36px; height: 36px; padding: 0; display: inline-flex; justify-content: center; align-items: center; }
+.remixRandomScopeControl { background: #e5f1ec; color: #226747; }
+.remixRandomAction { color: inherit; }
+.remixRandomScopeControl .randomScopeToggle { color: #226747; }
+.remixSource { display: block; padding: 0; background: var(--panel-flat); }
+.remixSource .mediaPreview { aspect-ratio: 4 / 3; width: 100%; height: auto; }
+.remixSource .mediaPreview img { width: 100%; height: 100%; object-fit: contain; }
+.remixSourceText { display: none; }
+.remixEmpty { min-height: 130px; aspect-ratio: 4 / 3; width: 100%; padding: 14px; line-height: 1.4; cursor: pointer; }
+.remixTweakPanel { margin-top: 8px; padding: 0; scroll-margin-top: calc(var(--topbar-height, 112px) + 12px); }
+.remixCreateRow { display: flex; justify-content: center; padding: 10px 0; }
+.remixCreateRow button { min-width: 180px; min-height: 44px; }
+.remixResult {
+  grid-template-columns: 1fr;
+  border-radius: 0;
+  padding: 8px 0;
+  gap: 10px;
+  scroll-margin-top: calc(var(--topbar-height, 112px) + 12px);
+}
+.remixResultMedia { background: #edf1f0; }
+.remixResultMedia img { max-height: 65svh; }
+.remixResultBody { gap: 8px; }
+.remixResultActions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.remixResultActions button { min-width: 0; min-height: 44px; padding: 0 6px; margin: 0; white-space: nowrap; font-size: 0.84rem; }
+.remixShareActions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.remixShareActions > span { flex-basis: 100%; text-align: center; font-size: 0.8rem; }
+.remixResult.is-arriving::before,
+.remixResult.is-arriving::after { display: none; }
+.generationOverlay {
+  border: 0;
+  padding: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: white;
+  width: min(320px, calc(100% - 32px));
+  overflow: visible;
+}
+.generationOverlay::backdrop { background: rgb(16 24 21 / 0.86); animation: generationDim 650ms ease both; }
+.generationOverlay .remixGeneratingPanel {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 110px;
+  min-width: 0;
+  padding: 0;
+  animation: generationPulse 1.7s ease-in-out infinite;
+}
+.generationStage { display: grid; gap: 6px; min-height: 80px; padding: 16px 8px 0; text-align: center; font-size: 0.9rem; line-height: 1.4; overflow-wrap: anywhere; }
+.generationStage small { font-size: 0.8rem; color: #d6e7df; }
+.remixProgressSummary { margin: 0; color: var(--ink-muted); font-size: 0.8rem; }
+.remixAttemptList summary { padding: 8px 0; font-size: 0.82rem; cursor: pointer; }
+@keyframes generationDim { from { background: rgb(16 24 21 / 0); } }
+@keyframes generationPulse { 50% { opacity: 0.65; transform: scale(0.97); } }
+.saveToast {
+  position: fixed;
+  z-index: 100;
+  top: max(12px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 24px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 14px;
+  border: 1px solid #82baa0;
+  border-radius: 6px;
+  background: #e1f6e9;
+  color: #21513b;
+  box-shadow: 0 3px 12px rgb(0 0 0 / 0.12);
+  animation: toastArrival 180ms ease both;
+}
+.saveToast.is-error { background: #fff1f2; border-color: #bd5a71; color: #882941; }
+.saveToast > span { min-width: 0; overflow-wrap: anywhere; }
+@keyframes toastArrival { from { opacity: 0; translate: 0 -10px; } }
+.fullPage {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: var(--ink);
+  background: var(--panel-flat);
+  overflow-y: auto;
+}
+.fullPageHeader { display: flex; align-items: center; gap: 14px; position: sticky; z-index: 2; top: 0; padding: 18px max(20px, env(safe-area-inset-left)); background: var(--panel-flat); border-bottom: 1px solid var(--border); }
+.fullPageHeader h1 { margin: 0; font-size: 1.25rem; }
+.fullPageContent { max-width: 1400px; margin: 0 auto; padding: 32px 28px max(36px, env(safe-area-inset-bottom)); }
+.remixPresentation { display: grid; grid-template-columns: minmax(0, 760px) minmax(260px, 1fr); gap: 40px; align-items: start; }
+.presentationMedia { min-width: 0; }
+.presentationMedia img { display: block; width: 100%; height: auto; }
+.recipePresentation { display: flex; flex-direction: column; gap: 24px; max-width: 1120px; margin: 0 auto; }
+.recipePresentation .presentationMedia { width: 100%; }
+.recipePresentation .presentationControls { position: static; order: -1; width: 100%; }
+.fullPage:has(.recipePresentation) { --recipe-preview-background: #fff5fc; background: var(--recipe-preview-background); overscroll-behavior-y: none; }
+.recipePreview { display: block; width: 100%; border: 0; background: var(--recipe-preview-background); color-scheme: light; }
+.presentationControls { position: sticky; top: 112px; min-width: 0; }
+.presentationActions { display: flex; flex-wrap: wrap; gap: 10px; }
+.presentationActions > * { min-height: 44px; padding: 8px; font-size: 0.85rem; text-decoration: none; }
+.presentationNotice { font-size: 0.85rem; margin: 14px 0 0; overflow-wrap: anywhere; }
+.shareLinkBox { display: flex; align-items: center; margin-top: 18px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.shareLinkBox input { min-width: 0; width: 100%; flex: 1; border: 0; padding: 12px; background: transparent; color: var(--ink); font: inherit; font-size: 0.85rem; }
+.shareLinkBox button { flex: 0 0 44px; }
+.shareRevoke { margin-top: 14px; min-height: 44px; }
+.metadataEditor { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: 40px; }
+.editorMedia { position: sticky; top: 112px; min-width: 0; }
+.editorMedia img, .editorMedia video { width: 100%; max-height: calc(100dvh - 150px); object-fit: contain; display: block; }
+.metadataForm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; }
+.metadataForm label { display: grid; gap: 8px; min-width: 0; font-size: 0.9rem; }
+.metadataForm input, .metadataForm textarea { width: 100%; min-width: 0; box-sizing: border-box; background: var(--panel-flat); color: var(--ink); border: 1px solid var(--border); border-radius: 6px; padding: 12px; font: inherit; font-size: 16px; }
+.metadataForm textarea { resize: vertical; }
+.wideField, .editorSave { grid-column: 1 / -1; }
+.editorSave { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.editorSave button { min-height: 44px; }
+@media (max-width: 760px) {
+  .fullPageHeader { padding: 12px; }
+  .fullPageContent { padding: 20px 14px 40px; }
+  .remixPresentation, .metadataEditor { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .presentationControls { position: static; grid-row: 1; }
+  .editorMedia { position: static; }
+  .editorMedia img, .editorMedia video { max-height: 45dvh; }
+}
+@media (max-width: 1100px) {
+  .appShell.isRemixOpen .remixPane { width: 92%; }
+}
+@media (max-width: 760px) {
+  .appShell.isMobileShell { padding-bottom: 0; }
+  body:has(.isMobileDetail) { overflow: hidden; overscroll-behavior: none; }
+  .appShell.isMobileDetail { height: 100dvh; min-height: 0; }
+  .isMobileShell .workspace { padding-left: 10px; padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .isMobileShell .content { padding-bottom: 0; }
+  .appShell.isMobileDetail .workspace { bottom: var(--mobile-actionbar-height, 57px); }
+  .isMobileShell .itemBody { min-height: 96px; }
+  .searchCluster { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+  .includeHiddenToggle { font-size: 0.7rem; }
+  .appShell.isRemixOpen .remixPane { width: 100%; margin: 0; }
+  .remixWorkspace { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .remixSlotHeader { gap: 2px; }
+  .remixSlotActions .compactAction, .remixSlotActions .remixRandomAction, .remixSlotActions .randomScopeToggle { width: 30px; min-width: 30px; }
+  .remixPromptModeColumns { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 2fr); gap: 6px; align-items: center; }
+  .remixPromptModeSlider .remixSliderTop { min-height: 46px; align-items: start; flex-direction: column; gap: 2px; }
+  .remixPromptModeSlider .remixSliderTop strong { font-size: 0.75rem; white-space: normal; overflow-wrap: anywhere; }
+  .remixInstructionChecks { gap: 4px; }
+  .remixInstructionCheck { min-height: 36px; padding: 4px 2px; font-size: 0.68rem; text-align: center; }
+  .remixSource { min-height: 0; }
+  .remixResult { padding: 8px 0; }
+  .remixResultActions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cardRemixActions button { font-size: 0.7rem; gap: 3px; }
+  .cardRemixActions button svg { width: 12px; flex-shrink: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .generationOverlay, .generationOverlay::backdrop, .generationOverlay *, .saveToast,
+  .remixResult.is-arriving, .remixResult.is-arriving img { animation: none !important; transition: none !important; }
+}
+
+/* Acid sticker-sheet pass: square, vivid, readable, and tighter. */
+:root {
+  --page-start: #fbff12;
+  --page-mid: #ff7ad9;
+  --page-end: #18f4d6;
+  --ink: #16120b;
+  --ink-soft: rgba(22, 18, 11, 0.78);
+  --ink-muted: rgba(22, 18, 11, 0.58);
+  --panel: rgba(255, 255, 255, 0.56);
+  --panel-strong: #fff9e8;
+  --panel-flat: #fff9e8;
+  --panel-deep: #16120b;
+  --chrome: rgba(255, 249, 232, 0.84);
+  --border: rgba(22, 18, 11, 0.62);
+  --border-strong: #16120b;
+  --accent: #ff2d95;
+  --accent-mid: #1238ff;
+  --accent-end: #00c875;
+  --accent-gradient: linear-gradient(90deg, #ff2d95 0%, #fbff12 48%, #18f4d6 100%);
+  --accent-gradient-vertical: linear-gradient(180deg, #ff2d95 0%, #fbff12 52%, #18f4d6 100%);
+  --accent-ghost: rgba(255, 45, 149, 0.15);
+  --accent-soft: rgba(18, 56, 255, 0.13);
+  --accent-ring: rgba(18, 56, 255, 0.34);
+  --remix-a: #ff2d55;
+  --remix-b: #00b86b;
+  --remix-a-rgb: 255 45 85;
+  --remix-b-rgb: 0 184 107;
+  --remix-gradient: linear-gradient(90deg, #ff2d55 0%, #fbff12 50%, #00b86b 100%);
+  --remix-soft-gradient:
+    repeating-linear-gradient(135deg, rgb(var(--remix-a-rgb) / 0.14) 0 9px, rgb(var(--remix-b-rgb) / 0.14) 9px 18px),
+    #fff9e8;
+  --warning: #c40035;
+  --warning-soft: #ffe3ef;
+  --warning-border: #c40035;
+  --success: #007a4b;
+  --success-soft: #ddfff0;
+  --success-border: #007a4b;
+}
+
+body {
+  background:
+    linear-gradient(90deg, rgba(22, 18, 11, 0.045) 1px, transparent 1px) 0 0 / 18px 18px,
+    linear-gradient(0deg, rgba(22, 18, 11, 0.035) 1px, transparent 1px) 0 0 / 18px 18px,
+    radial-gradient(circle at 12% 12%, rgba(251, 255, 18, 0.9), transparent 26%),
+    radial-gradient(circle at 88% 18%, rgba(24, 244, 214, 0.62), transparent 24%),
+    radial-gradient(circle at 50% 86%, rgba(255, 122, 217, 0.7), transparent 28%),
+    linear-gradient(135deg, var(--page-start), var(--page-mid) 56%, var(--page-end));
+}
+
+:is(button, input, textarea, select, dialog, .topbar, .brand, .brandMark, .searchBox, .itemCard, .mediaPreview, .missingPreview, .detail, .detailMedia, .secondaryAction, .primaryButton, .iconButton, .filterButton, .randomScopeControl, .randomActionButton, .remixPane, .remixSlot, .remixSource, .remixEmpty, .remixCenter, .remixRandomScopeControl, .remixRandomAction, .compactAction, .remixTweakPanel, .remixInstructionCheck, .remixResultMedia, .saveToast, .fullPage, .shareLinkBox, .metadataForm input, .metadataForm textarea, .mobileActionBar, .mobileActionBar button, .tagGrid button) {
+  border-radius: 0 !important;
+}
+
+:is(.itemCard, .detail, .remixPane, .fullPage, .mobileActionBar, .searchBox, .secondaryAction, .primaryButton, .iconButton, .tagGrid button) {
+  box-shadow: 2px 2px 0 rgba(22, 18, 11, 0.16) !important;
+}
+
+.appShell {
+  padding-top: var(--topbar-height, 112px);
+}
+
+.topbar {
+  position: fixed;
+  inset: 0 0 auto;
+  grid-template-columns: minmax(240px, auto) minmax(180px, 1fr);
+  gap: 16px;
+  padding: 6px 14px;
+  border-bottom: 3px solid var(--border-strong);
+  background:
+    linear-gradient(90deg, rgba(255, 45, 149, 0.19), rgba(251, 255, 18, 0.18) 44%, rgba(24, 244, 214, 0.22)),
+    var(--panel-flat);
+  box-shadow: none !important;
+  backdrop-filter: none;
+}
+
+.appShell.isRemixOpen .topbar {
+  border-bottom: 0;
+}
+
+.brand {
+  min-height: 38px;
+  gap: 8px;
+  padding: 0;
+}
+
+.brandMark {
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--border-strong);
+  background: #fbff12;
+  filter: none;
+}
+
+.brandText {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.brand h1 {
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.brandCount {
+  padding: 2px 6px;
+  border: 1px solid var(--border-strong);
+  background: #18f4d6;
+  color: var(--ink);
+  font-size: 0.68rem !important;
+  font-weight: 900;
+  line-height: 1.1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.searchCluster {
+  grid-template-columns: minmax(140px, 20vw) auto;
+}
+
+.searchBox {
+  min-height: 38px;
+  border: 2px solid var(--border-strong);
+  background: #fff9e8;
+  box-shadow: inset 4px 0 0 #ff2d95 !important;
+}
+
+.searchBox input {
+  min-height: 36px;
+  font-weight: 800;
+}
+
+.includeHiddenToggle {
+  min-height: 38px;
+  padding: 0 7px;
+  border: 2px solid var(--border-strong);
+  background: rgba(251, 255, 18, 0.56);
+  color: var(--ink);
+}
+
+.workspace {
+  gap: 9px;
+  padding-top: 9px;
+  padding-left: 14px;
+}
+
+.workspace.isGalleryOnly {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.sectionBar {
+  min-height: 24px;
+  margin-bottom: 6px;
+}
+
+.sectionSummary {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 8px;
+}
+
+.sectionSummary strong {
+  padding: 2px 6px;
+  border: 1px solid var(--border-strong);
+  background: #fbff12;
+  color: var(--ink);
+}
+
+.textPanel { border-radius: 0; }
+
+.itemCard {
+  border: 2px solid var(--border-strong);
+  background:
+    linear-gradient(180deg, rgba(255, 249, 232, 0.96), rgba(255, 249, 232, 0.82)),
+    repeating-linear-gradient(135deg, rgba(255, 45, 149, 0.08) 0 8px, rgba(24, 244, 214, 0.08) 8px 16px);
+}
+
+.itemCard.selected {
+  outline: 3px solid #1238ff;
+  outline-offset: -3px;
+}
+
+.itemBody {
+  padding: 7px;
+  align-content: start;
+}
+
+.itemBody strong {
+  height: 2.5em;
+  min-height: 2.5em;
+  line-height: 1.25;
+}
+
+@media (min-width: 761px) {
+  .galleryGrid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 172px), 1fr));
+  }
+
+  .detailPanelWrapper {
+    padding-bottom: calc(var(--mobile-actionbar-height, 57px) + 12px);
+  }
+
+  .detailPanelWrapper .detail {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    overscroll-behavior: auto;
+    scroll-margin-top: calc(var(--topbar-height, 112px) + 12px);
+  }
+}
+
+.chip,
+.statePill,
+.blockPill {
+  border-radius: 0 !important;
+}
+
+.chip {
+  border: 1px solid rgba(22, 18, 11, 0.46);
+  background: rgba(24, 244, 214, 0.22);
+}
+
+.iconButton,
+.secondaryAction,
+.primaryButton,
+.filterButton,
+.tabs button,
+.compactAction {
+  border: 2px solid var(--border-strong);
+  font-weight: 900;
+}
+
+.iconButton {
+  background: #18f4d6;
+  color: var(--ink);
+}
+
+.secondaryAction {
+  background: #fff9e8;
+}
+
+.primaryButton {
+  background: var(--ink);
+  color: #fff9e8;
+}
+
+.blockNotice {
+  border-width: 2px;
+  background:
+    repeating-linear-gradient(135deg, rgba(196, 0, 53, 0.11) 0 8px, rgba(255, 227, 239, 0.96) 8px 16px);
+}
+
+.blockNotice .classificationRetry {
+  min-width: 38px;
+  border: 2px solid var(--warning);
+  background: #fff9e8;
+}
+
+.remixWorkspace {
+  gap: 8px;
+}
+
+.remixSlotHeader {
+  min-height: 22px;
+}
+
+.remixSlotHeader strong {
+  padding: 2px 6px;
+  border: 2px solid var(--border-strong);
+  background: #ff2d55;
+  color: #fff9e8 !important;
+}
+
+.remixSlot[aria-label="B"] .remixSlotHeader strong {
+  background: #00b86b;
+  color: #fff9e8 !important;
+}
+
+.remixSource,
+.remixEmpty,
+.remixCenter {
+  border: 2px solid var(--border-strong);
+  background:
+    linear-gradient(180deg, rgba(255, 249, 232, 0.85), rgba(255, 249, 232, 0.62)),
+    repeating-linear-gradient(135deg, rgba(255, 45, 85, 0.08) 0 9px, rgba(0, 184, 107, 0.08) 9px 18px);
+}
+
+.remixActionGroup {
+  gap: 5px;
+}
+
+.remixAnalyze,
+.remixSafety {
+  min-height: 38px;
+}
+
+.remixSafety {
+  background: #fbff12;
+  color: var(--ink);
+}
+
+.remixSafety.active {
+  background: #00b86b;
+  color: #fff9e8;
+}
+
+.remixStatusDock {
+  width: min(100%, 240px);
+  min-height: 2px;
+  opacity: 0.72;
+}
+
+.remixStatus,
+.remixHint {
+  padding: 2px 6px;
+  border-left: 3px solid var(--border-strong);
+  background: rgba(255, 249, 232, 0.54);
+  font-size: 0.68rem !important;
+}
+
+.remixTweakPanel {
+  background: transparent;
+}
+
+.remixCreateRow {
+  padding: 8px 0;
+}
+
+.remixCreate {
+  min-height: 46px;
+  border: 2px solid var(--border-strong);
+  background: #16120b;
+  color: #fff9e8;
+  box-shadow: 2px 2px 0 rgba(22, 18, 11, 0.22) !important;
+}
+
+.remixResult {
+  border-top: 3px solid var(--border-strong);
+  background:
+    linear-gradient(90deg, rgba(24, 244, 214, 0.14), transparent 46%, rgba(255, 45, 149, 0.12));
+}
+
+.remixResultMedia {
+  border: 2px solid var(--border-strong);
+  background:
+    conic-gradient(from 90deg at 50% 50%, rgba(255, 45, 149, 0.18), rgba(251, 255, 18, 0.22), rgba(24, 244, 214, 0.18), rgba(255, 45, 149, 0.18)),
+    #fff9e8;
+}
+
+.destinationNav,
+.mobileActionBar {
+  border-top: 3px solid var(--border-strong);
+  background:
+    linear-gradient(90deg, rgba(255, 45, 149, 0.22), rgba(251, 255, 18, 0.24) 50%, rgba(24, 244, 214, 0.28)),
+    #fff9e8;
+  box-shadow: 0 -2px 0 rgba(22, 18, 11, 0.16) !important;
+}
+
+.destinationNav button,
+.mobileActionBar button {
+  border: 2px solid transparent;
+  color: var(--ink);
+}
+
+.destinationNav button.active,
+.destinationNav .remixActive.active,
+.mobileActionBar button.active,
+.mobileActionBar .remixActive.active {
+  border-color: var(--border-strong);
+  background: #16120b;
+  color: #fff9e8;
+}
+
+.fullPage {
+  background:
+    linear-gradient(90deg, rgba(22, 18, 11, 0.045) 1px, transparent 1px) 0 0 / 20px 20px,
+    linear-gradient(0deg, rgba(22, 18, 11, 0.035) 1px, transparent 1px) 0 0 / 20px 20px,
+    linear-gradient(135deg, #fff9e8 0%, #ffd8ef 48%, #d7fff6 100%);
+}
+
+.fullPageHeader {
+  border-bottom: 3px solid var(--border-strong);
+  background: rgba(255, 249, 232, 0.9);
+  backdrop-filter: blur(10px);
+}
+
+.shareLinkBox,
+.metadataForm input,
+.metadataForm textarea {
+  border: 2px solid var(--border-strong);
+  background: rgba(255, 249, 232, 0.82);
+}
+
+.generationOverlay {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 22px;
+  border: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 249, 232, 0.09) 1px, transparent 1px) 0 0 / 22px 22px,
+    linear-gradient(0deg, rgba(255, 249, 232, 0.08) 1px, transparent 1px) 0 0 / 22px 22px,
+    radial-gradient(circle at 28% 22%, rgba(255, 45, 149, 0.82), transparent 28%),
+    radial-gradient(circle at 72% 28%, rgba(24, 244, 214, 0.78), transparent 30%),
+    radial-gradient(circle at 52% 78%, rgba(251, 255, 18, 0.74), transparent 32%),
+    #16120b;
+  color: #fff9e8;
+  overflow: hidden;
+}
+
+.generationOverlay::backdrop {
+  background: #16120b;
+  animation: generationDim 420ms ease both;
+}
+
+.generationOverlay .remixGeneratingPanel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 249, 232, 0.12) 0 11px, transparent 11px 22px),
+    radial-gradient(circle at 50% 46%, rgba(255, 249, 232, 0.34), transparent 18%),
+    linear-gradient(90deg, #ff2d95, #1238ff, #18f4d6, #fbff12, #ff2d95);
+  background-size: auto, 320% 100%;
+  color: #16120b;
+  text-transform: uppercase;
+  animation: remixGeneratingGradient 2.1s linear infinite;
+  box-shadow: none !important;
+}
+
+.generationOverlay .remixGeneratingPanel::after {
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.36), transparent) -120% 0 / 42% 100% no-repeat,
+    radial-gradient(circle, rgba(255, 255, 255, 0.86) 0 1px, transparent 1.8px) 0 0 / 9px 9px,
+    radial-gradient(circle, color-mix(in srgb, var(--generate-b, #286ee6) 65%, white) 0 1px, transparent 1.8px) 0 0 / 15px 13px;
+  -webkit-mask-image: none;
+  mask-image: none;
+  transform: none;
+  animation: generationDotDrift 6s linear infinite;
+}
+
+@keyframes generationDotDrift {
+  to { background-position: 220% 0, 36px 27px, -30px 26px; }
+}
+
+.remixGeneratingWord {
+  padding: 8px 14px;
+  border: 3px solid #16120b;
+  border-radius: 0;
+  background: #fff9e8;
+  color: #16120b;
+  line-height: 1;
+  max-width: calc(100% - 32px);
+  box-shadow: none;
+  animation: generationPulse 1.55s ease-in-out infinite;
+}
+
+.generationStage {
+  position: absolute;
+  z-index: 2;
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  width: auto;
+  min-height: 0;
+  padding: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  color: #fff9e8;
+  font-weight: 900;
+  text-align: center;
+  isolation: isolate;
+}
+
+.generationOverlay::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 0;
+  height: 160px;
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.78));
+  pointer-events: none;
+}
+
+.generationStage span,
+.generationStage small {
+  color: inherit;
+  text-shadow: 1px 1px 0 rgba(22, 18, 11, 0.72);
+}
+
+@keyframes generationPulse {
+  50% { opacity: 0.88; transform: scale(0.985) rotate(-0.5deg); }
+}
+
+@media (max-width: 860px) {
+  .topbar {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 6px 10px;
+  }
+
+  .brandText {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .searchCluster {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .appShell.isMobileDetail .content {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .appShell.isMobileDetail .sectionBar {
+    display: none;
+  }
+
+  .mobileDetailWrapper .detail {
+    border: 0;
+  }
+
+  .destinationNav,
+  .mobileActionBar {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    padding: 0 0 env(safe-area-inset-bottom);
+    border-width: 3px 0 0;
+    transform: none;
+  }
+
+  .destinationNav button,
+  .mobileActionBar button {
+    min-height: 58px;
+  }
+}
+
+@media (max-width: 760px) {
+  .remixWorkspace {
+    padding: 0;
+  }
+
+  .remixCenter {
+    padding: 5px;
+  }
+}
+
+/* Tighten the remix controls after the loud visual pass. */
+.appShell.isRemixOpen .workspace {
+  padding-top: 4px;
+}
+
+.remixWorkspace {
+  gap: 6px;
+  padding: 0;
+}
+
+.remixCenter {
+  border: 0;
+  background: transparent;
+  padding: 0 2px;
+}
+
+.remixSlot {
+  gap: 3px;
+}
+
+.remixSlotHeader {
+  min-height: 34px;
+}
+
+.remixSlotActions {
+  gap: 4px;
+}
+
+.remixRandomScopeControl,
+.remixInstructionCheck,
+.remixSlotActions .compactAction,
+.remixRandomScopeControl .randomScopeToggle {
+  min-height: 38px;
+  border: 2px solid var(--border-strong);
+  background: #fff9e8;
+  color: var(--ink);
+  box-shadow: 2px 2px 0 rgba(22, 18, 11, 0.16) !important;
+}
+
+.remixRandomScopeControl {
+  position: static;
+  display: inline-flex;
+  overflow: visible;
+}
+
+.remixRandomAction,
+.remixRandomAction.randomActionButton {
+  min-width: 42px;
+  width: 42px;
+  min-height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+
+.remixRandomScopeControl .randomScopeToggle {
+  width: 30px;
+  min-width: 30px;
+  min-height: 34px;
+  border-width: 0 0 0 2px;
+  box-shadow: none !important;
+}
+
+.remixRandomScopeMenu {
+  top: calc(100% + 4px);
+  right: 0;
+  width: 190px;
+  gap: 4px;
+  padding: 5px;
+  border: 2px solid var(--border-strong);
+  border-radius: 0 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 249, 232, 0.98), rgba(255, 249, 232, 0.9)),
+    repeating-linear-gradient(135deg, rgba(255, 45, 149, 0.12) 0 8px, rgba(24, 244, 214, 0.12) 8px 16px);
+  box-shadow: 2px 2px 0 rgba(22, 18, 11, 0.18) !important;
+}
+
+.remixSlot[aria-label="A"] .remixRandomScopeMenu {
+  left: 0;
+  right: auto;
+}
+
+.remixRandomScopeMenu button {
+  min-height: 38px;
+  grid-template-columns: minmax(0, 1fr) 18px;
+  padding: 5px 7px;
+  border: 2px solid transparent;
+  border-radius: 0 !important;
+  background: #fff9e8;
+  color: var(--ink);
+}
+
+.remixRandomScopeMenu button:hover,
+.remixRandomScopeMenu button:focus-visible,
+.remixRandomScopeMenu button.active {
+  border-color: var(--border-strong);
+  background: #fbff12;
+  outline: 0;
+}
+
+.remixRandomScopeMenu button.active {
+  background: #16120b;
+  color: #fff9e8;
+}
+
+.remixRandomScopeMenu button.active small {
+  color: rgba(255, 249, 232, 0.72);
+}
+
+.remixRandomScopeMenu button.active svg {
+  color: inherit;
+}
+
+.remixRandomScopeControl.is-filtered,
+.remixInstructionCheck:has(input:checked) {
+  background: #00b86b;
+  color: #fff9e8;
+}
+
+.remixInstructionChecks {
+  gap: 5px;
+  padding-top: 0;
+}
+
+.remixInstructionCheck {
+  min-height: 38px;
+  font-size: 0.72rem;
+}
+
+.remixTweakPanel {
+  margin-top: 5px;
+}
+
+.remixCreateRow {
+  padding: 6px 0;
+}
+
+.mobileDetailBar {
+  margin: 0 0 6px;
+}
+
+.mobileBackButton {
+  width: max-content;
+  min-height: 38px;
+  background: #fbff12;
+  color: var(--ink);
+}
+
+.destinationNav .navText,
+.mobileActionBar .navText {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.destinationNav button > svg,
+.mobileActionBar button > svg {
+  width: 32px;
+  height: 32px;
+  padding: 3px;
+  border: 2px solid var(--border-strong);
+  background: #fff9e8;
+  color: #16120b;
+  stroke-width: 2.3;
+}
+
+.destinationNav button.active > svg,
+.mobileActionBar button.active > svg {
+  background: #fff9e8;
+  color: #16120b;
+}
+
+.destinationNav button,
+.mobileActionBar button {
+  min-height: 54px;
+  gap: 0;
+}
+
+@media (max-width: 860px) {
+  .appShell.isMobileDetail .content {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .appShell.isMobileDetail .sectionBar {
+    display: flex;
+  }
+}
+
+@media (max-width: 760px) {
+  .appShell.isRemixOpen .workspace {
+    padding: 6px 8px calc(66px + env(safe-area-inset-bottom));
+  }
+
+  .remixWorkspace {
+    gap: 6px;
+  }
+
+  .remixSource,
+  .remixEmpty {
+    border-width: 2px;
+  }
+
+  .remixSlotActions .compactAction,
+  .remixSlotActions .remixRandomAction,
+  .remixSlotActions .randomScopeToggle {
+    width: 34px;
+    min-width: 34px;
+  }
+
+  .generationOverlay .remixGeneratingPanel {
+    width: 100%;
+    height: 100%;
+  }
+
+  .generationStage {
+    width: auto;
+  }
+}
+
+/* Final polish: invisible gallery splitter, neutral tags, one font voice. */
+:root {
+  --font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --type-xs: 0.72rem;
+  --type-sm: 0.82rem;
+  --type-md: 0.94rem;
+  --type-lg: 1.08rem;
+  font-family: var(--font-ui);
+}
+
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-ui);
+}
+
+.appShell,
+.detail,
+.remixPane,
+.fullPage,
+.randomScopeMenu {
+  font-size: var(--type-sm);
+}
+
+.brand h1,
+.detail h2,
+.remixResultBody h2,
+.fullPageHeader h1,
+.tagGroup h2 {
+  font-size: var(--type-lg) !important;
+  line-height: 1.12;
+}
+
+.itemBody strong,
+.remixSource strong,
+.remixTweakToggle strong,
+.sectionSummary strong {
+  font-size: var(--type-md) !important;
+}
+
+.brandCount,
+.sectionSummary > span,
+.itemTopline,
+.chip,
+.mediaPill,
+.statePill,
+.blockNotice small,
+.randomScopeMenu small,
+.remixStatus,
+.remixHint,
+.remixInstructionCheck,
+.cardRemixActions button,
+.remixResultActions button,
+.presentationNotice,
+.remixProgressSummary,
+.remixAttemptList summary {
+  font-size: var(--type-xs) !important;
+}
+
+.detail p,
+.facts,
+.remixTweakSummary,
+.remixTweakNotice,
+.metadataForm label,
+.presentationActions > *,
+.shareLinkBox input {
+  font-size: var(--type-sm) !important;
+}
+
+.remixGeneratingWord {
+  font-size: 3rem;
+}
+
+@media (max-width: 760px) {
+  .remixGeneratingWord {
+    font-size: 2rem;
+  }
+}
+
+.generationStage {
+  font-size: var(--type-md) !important;
+}
+
+.generationStage small {
+  font-size: var(--type-sm) !important;
+}
+
+.chip,
+.chip:nth-child(2n) {
+  border: 1px solid rgba(22, 18, 11, 0.28);
+  background: #e5e5e5;
+  color: #16120b;
+}
+
+.detailResizeHandle {
+  opacity: 0;
+  pointer-events: auto;
+}
+
+.detailResizeHandle::before,
+.detailResizeHandle:hover::before,
+.detailResizeHandle:focus-visible::before,
+.workspace.is-resizing-detail .detailResizeHandle::before {
+  background: transparent;
+}
+
+.detailResizeHandle:focus-visible {
+  outline: 0;
+}
+
+.remixTweakPanel,
+.remixTweakContent,
+.remixControls {
+  min-width: 0;
+}
+
+.remixTweakContent {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.remixTweakSummary,
+.remixTweakNotice,
+.remixTweakStatus {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.remixPromptModeColumns {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 2fr);
+}
+
+.remixSlider {
+  grid-template-columns: minmax(0, 1fr);
+  border-top: 1px solid #fff;
+}
+
+.remixSlider > *,
+.remixSliderTop,
+.remixSliderScale {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.remixSliderTop strong,
+.remixSliderDescription,
+.remixSliderScale span {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.remixSliderTop {
+  align-items: flex-start;
+}
+
+.remixSliderTop output {
+  flex-shrink: 0;
+}
+
+.remixSliderScale {
+  align-items: flex-start;
+}
+
+.remixSliderScale span {
+  flex: 1 1 0;
+}
+
+.remixSliderScale span:last-child {
+  text-align: right;
+}
+
+.remixSlider input[type="range"] {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  margin-inline: 0;
+}
+
+.remixTweakStatus,
+.remixTweakSummary,
+.remixTweakNotice,
+.remixSliderDescription,
+.remixFailurePanel p {
+  min-width: 0;
+  white-space: normal;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  line-height: 1.5;
+}
+
+.remixFailurePanel {
+  border-radius: 0;
+  padding: 12px;
+  background: #fff0f5;
+  border: 1px solid var(--ink);
+}
+
+.remixFailurePanel p {
+  color: var(--ink);
+  font-size: var(--type-sm);
+}
+
+.remixInstructionCheck,
+.remixSafety {
+  background: #fff !important;
+  color: #626262 !important;
+  border: 1px solid var(--ink);
+  box-shadow: none !important;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.remixInstructionCheck:has(input:checked),
+.remixSafety.active {
+  background: #007a4b !important;
+  color: #fff !important;
+}

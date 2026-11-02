@@ -1,0 +1,35 @@
+# Optional external-proxy example: replace the hostname and import outside other sites.
+share.example.net {
+    log {
+        output discard
+    }
+    header {
+        Cache-Control "no-store"
+        X-Robots-Tag "noindex, nofollow, noarchive"
+        Referrer-Policy "no-referrer"
+    }
+
+    @share_read {
+        method GET HEAD
+        path_regexp share_read ^/[A-Z2-9]{5}(/(media|poster|card(/image)?))?$
+    }
+    handle @share_read {
+        reverse_proxy meme-arsenal-app:8000
+    }
+
+    @share_events {
+        method POST
+        path_regexp share_events ^/[A-Z2-9]{5}/events$
+    }
+    handle @share_events {
+        request_body {
+            max_size 16KB
+        }
+        reverse_proxy meme-arsenal-app:8000
+    }
+
+    # Never publish the dashboard, API, raw media tree, or share-management routes.
+    handle {
+        respond "Not found" 404
+    }
+}

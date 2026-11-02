@@ -1,0 +1,24 @@
+name: meme-arsenal-chromium-tests
+
+services:
+  chromium-tests:
+    build:
+      context: ../..
+      dockerfile: docker/test-chromium.Dockerfile
+    working_dir: /workspace
+    volumes:
+      - ../..:/workspace
+      - test-node-modules:/workspace/frontend/dashboard/node_modules
+      - test-pip-cache:/tmp/pip-cache
+      - test-npm-cache:/root/.npm
+    environment:
+      PIP_CACHE_DIR: /tmp/pip-cache
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      CI: "1"
+    shm_size: 1gb
+
+volumes:
+  test-node-modules:
+  test-pip-cache:
+  test-npm-cache:

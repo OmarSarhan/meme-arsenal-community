@@ -1,0 +1,56 @@
+(public_upstream) {
+    reverse_proxy app:8000 {
+        header_up Host SHARE_AUTHORITY
+        header_up X-Forwarded-Host SHARE_AUTHORITY
+        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-For {remote_host}
+        header_up -Forwarded
+        header_up -X-Forwarded-Prefix
+        header_up -X-Real-IP
+        header_up -Authorization
+        header_up -Cookie
+    }
+}
+
+https://SHARE_AUTHORITY {
+    log {
+        output discard
+    }
+    header {
+        Cache-Control "no-store"
+        X-Robots-Tag "noindex, nofollow, noarchive"
+        Referrer-Policy "no-referrer"
+    }
+    @read {
+        method GET
+        path_regexp read ^/[A-Z2-9]{5}(/(media|poster|card(/image)?))?$
+    }
+    @head {
+        method HEAD
+        path_regexp head ^/[A-Z2-9]{5}(/(media|poster))?$
+    }
+    @events {
+        method POST
+        path_regexp events ^/[A-Z2-9]{5}/events$
+    }
+    @foreign_origin {
+        header Origin *
+        not header Origin https://SHARE_AUTHORITY
+    }
+    route {
+        respond @foreign_origin 403
+        request_body {
+            max_size 16KB
+        }
+        handle @read {
+            import public_upstream
+        }
+        handle @head {
+            import public_upstream
+        }
+        handle @events {
+            import public_upstream
+        }
+        respond 404
+    }
+}

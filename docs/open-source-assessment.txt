@@ -1,0 +1,132 @@
+Meme Arsenal: investigated open-source route
+
+Historical assessment: source commit 345a33b3defab37c55b5a13ce6e0dc373750a138 and onboarding documentation/CLI edits later committed in 9620f2b5c4d3c23956eed9f37735594d1acb5688. Findings and line numbers below describe that snapshot, not current release readiness. The 2026-11-02 publication cleanup generalizes operational context while retaining historical results and limitations; see source-alpha-status.txt for later evidence.
+
+Three focused agents independently investigated (1) release/onboarding/distribution, (2) extension architecture, and (3) trust/privacy/operations. The parent cross-checked important claims and ran a small offline test selection. All read the Karpathy guidance; no applicable repository AGENTS.md/CODEX.md was found. All work stayed within this project. No production service, live database, real environment/secret file, provider API, Telegram account, or deployment was accessed. No installations, builds, or tracked-file changes were made.
+
+Working audience assumption: technically comfortable individuals self-hosting a single trusted library. The user was invited to choose individuals, extension developers, or teams; no choice had arrived when this report was prepared. If teams are the target, the identity and ownership work below becomes a different product milestone.
+
+Recommendation
+
+Release the opinionated application first. Keep Telegram-first importing, the current visual personality, remix controls, and chosen AI defaults. Make installation and data recovery reproducible, document the existing integration points, and demonstrate extensibility through concrete follow-up features. Do not make a plugin framework, neutral provenance schema, or runtime unification prerequisites for source publication.
+
+Separate two promises:
+- Public source alpha: licensed code with publication clearance, honest setup instructions, feature limits, and an intelligible contributor path.
+- Supported self-hosted release: a documented deployment that a new operator can start, protect, restart, upgrade, and restore on a clean machine.
+
+Source publication can precede all extension features. A supported hosting claim should wait for the relevant deployment and recovery gates.
+
+The initial product contract
+
+Use the online API-backed deployment as the canonical full-feature user distribution. The existing app, worker, sync service, PostgreSQL, Redis, and authenticated reverse proxy are already the working architecture. A portable community Compose setup can preserve that architecture without depending on an external deployment manager. Keep operator configuration outside the source distribution.
+
+Keep editable source installation as the contributor path, and keep the SQLite/static fixture demo as a clearly limited offline introduction. Local and hosted modes are not feature-equivalent: the current frontend gates manual metadata editing, public sharing, and saved-remix deletion on apiBase. Mock mode does not perform remix generation. The source demo can demonstrate browsing, processing, and mock classification, but must not imply the complete hosted experience or useful semantic AI output.
+
+This is a trusted-library application, not presently a multi-tenant service. Browser-session IDs isolate draft jobs and personal curation; they are not login accounts. Hosted authentication is supplied by the external reverse proxy. Shared editing/deletion of published items is intentional within that authenticated boundary. Public share links are a separate, explicitly public publication mechanism. Keeping code public does not require making the user's archive public.
+
+Evidence that changes the route
+
+1. Distribution is currently tied to a checkout and the owner's deployment.
+   - deploy/service/compose.yml:192 required an external edge network; :205 onwards named host-specific secret files. It used pre-existing host bind directories and exposed the app to the proxy network rather than shipping a standalone protected public entry point. Current examples generalize those paths; community setup has its own recipe.
+   - src/meme_arsenal/config.py:15 used a fixed development-workspace storage default. Current cleanup uses ./meme-arsenal-reserve while preserving explicit overrides.
+   - src/meme_arsenal/dashboard.py:11 discovers frontend/dashboard relative to the Python module. The agent verified that an ordinary installed-module location computes a path inside the virtualenv's lib tree, not the source checkout. pyproject.toml packages src code, with no equivalent bundled React/migration distribution arrangement. A missing frontend causes the local basic fallback; online dashboard builds fail.
+   - Dockerfile:34 contains the built frontend at /app/static-dashboard, but docker/online-entrypoint.sh:8 copies it only with ARSENAL_INSTALL_DASHBOARD=1. Existing Compose supplies that setting. The entrypoint's fallback RESERVE_PATH is not exported when it was absent from the incoming environment.
+   Decision: advertise and verify the exact source/Compose workflows initially. Do not promise a turnkey wheel, bare docker run, native Windows support, or multiple installation methods before testing them. The unconditional fcntl import in media.py is a concrete native-Windows limitation. CI currently targets Python 3.12 and Node 22; the lockfile requires a sufficiently recent Node patch version, not arbitrary Node/npm.
+
+2. The authenticated proxy belongs inside the portable deployment contract.
+   - online.py:1187 creates anonymous browser sessions; it does not authenticate a user.
+   - deploy/service/public-share.Caddyfile is the share-host allowlist, not the dashboard authentication configuration.
+   - Adding a public port to the existing app service would bypass the protection supplied by the external authenticated proxy.
+   Decision: include a protected reverse-proxy recipe or explicitly restrict an alternative developer recipe to loopback. Do not add an account/RBAC subsystem just to serve one owner. Acceptance must check dashboard, API, and raw media protection separately from the optional public share hostname.
+
+3. The demo exists, but release verification does not cover the entire current UI.
+   - cli.py fixture sync already runs importer -> processing -> mock classification -> embedding -> catalog/dashboard.
+   - tests/test_e2e.py:22 deliberately forces the fallback frontend. It is not proof that the modern React quick start works.
+   - .github/workflows/ci.yml:45 excludes chromium tests from backend verification. scripts/run_chromium_tests.sh:16 and deploy/test/compose.yml:9 name only the older dashboard and live-dashboard suites. The newer workflow and recipe suites are excluded from that selection.
+   - tests/test_dashboard_workflow.py:18-27 needs Playwright and a built dashboard; the current browser Docker image installs [dev], not [browser]. Installing the missing dependency alone does not fix the omitted test selection or required frontend build.
+   - Parent reproduced the current share-page test failure at tests/test_online_api.py:222: test expects the changed message caption while rendering prefers classification.summary. This is a test/behavior contract mismatch, not a confirmed escaping vulnerability.
+   Decision: close these specific verification gaps and test the documented distribution, rather than measuring readiness by whether a CI file exists.
+
+4. Provider configuration is coupled to execution, persistence, and recovery.
+   - ai.py:735 and embeddings.py:36 both select through settings.ai_provider. remix.py:548 enables remix only for Google. Existing OpenAI classification plus Google remix cannot be configured independently even when both keys exist.
+   - online_worker.py:324 and cli.py:592-616 use the global provider to decide Google credit pause/probe behavior. Introducing per-capability settings without changing those decisions would produce incorrect pause/resume behavior.
+   - models.py:167-213 identifies classifications by item/model/prompt-version and embeddings by item/model/source. Provider identity, embedding dimensions, and source-content identity are not fully represented in reuse decisions. embeddings.py:127-135 returns an existing embedding unless forced.
+   - Agent verified that a different classification prompt version can still reuse the old embedding. search.py:88-94 selects embeddings by model name; changed dimensions need coherent selection and regeneration too.
+   - models.py:349-378 snapshots job inputs/tweaks but not effective provider/model/prompt identity. online_worker.py:129 runs using current worker settings, and remix.py:1766 records save-time settings. A later configuration change must not silently misattribute a queued or completed result.
+   Decision: publication needs an honest provider capability guide, not architectural extraction. The first provider feature should be mixed routing using existing adapters, with backward-compatible defaults, per-provider recovery decisions, and explicit cache/job provenance. Do not start by adding a third provider.
+
+5. A folder importer needs stable identity; it does not require replacing the whole schema first.
+   - models.py:94 requires a TelegramMessage backing row, but current uploads and remixes already use synthetic message records. A compatibility ingestion helper can hide that detail from a new importer while preserving MediaItem IDs and downstream behavior.
+   - telegram_importer.py:657-665 assigns fixture IDs by sorted directory position when no manifest exists; :685-688 skips known IDs.
+   - Agent reproduced importing b.png, then adding a.png: the resulting captions were ['b', 'b']; a.png was skipped and b.png duplicated. The test fixture importer is not a safe production folder-sync feature.
+   - A wholesale provenance migration touches pipeline joins, sorting, captions/search/catalog, Telegram links, and private-upload ownership checks that use chat_id namespaces. Making the message foreign key nullable is not an adequate migration.
+   Decision: add a narrow, idempotent import boundary with source kind, namespace, stable external key, caption/date, local media, and visibility. Persist the identity mapping; do not use directory positions or an unchecked truncated hash as the primary external identity. A small additive key/mapping change is acceptable if needed. Defer a full neutral-source schema until an actual second source exposes its necessity.
+
+6. Opinionated prompts can be customizable without handing over structural control.
+   - ai.py:581-600 and :634-654 build provider-specific classification prompts. remix.py:937-1003 assembles style guidance, output schema instructions, media and mitigation context.
+   - Existing ClassificationPayload, RemixSource, RemixResult, process_media_item, generate_remix, and save_remix_result are useful integration seams now.
+   Decision: document these as internal contracts. When runtime prompt customization is implemented, start with bounded style guidance or named profiles. Keep output-schema instructions, media assembly, and retry mechanics in code. Record effective prompt identity and define how to refresh derived classification/embeddings. Avoid executable plugins or a new template language.
+
+7. The data contract must include AI disclosure and a real restore procedure.
+   - online.py:990 classifies private uploads; ai.py:403 includes captions, OCR, link-preview metadata and visual material. Optional video context can include audio/original video. 'Private draft' refers to application visibility, not isolation from the configured provider.
+   - google_api.py:258 and :303 sanitize request logging, but request text can remain in error records. Describe local logs/database retention accurately; do not claim provider retention guarantees not established by this review.
+   - scripts/service_backup_postgres.sh:36 dumps PostgreSQL and :51 archives reserve files separately without quiescing writers. A deletion between the two can leave the dump referring to absent files.
+   - The dump is custom-format (-Fc); public restore instructions should explicitly use pg_restore. The session-signing secret is external to the DB/reserve archive and is needed to preserve existing browser identities and legacy signed links. Protect it separately and document recovery.
+   - export-catalog is a browsing export, not a complete backup or a scrubbed public dataset.
+   Decision: add one simple quiesced backup procedure and prove a disposable restore, rather than redesigning the backup subsystem. Test one declared supported upgrade path and preserve current production data/IDs.
+
+Proposed delivery sequence and acceptance gates
+
+Stage A: publication-ready source alpha.
+- Preserve the developer guide in docs/development.md rather than creating competing setup instructions.
+- State audience, current capabilities, trusted-user model, provider disclosure, supported development versions, and local/online differences.
+- Owner selects code license. Confirm bundled asset/contribution rights and required notices; record sample-media provenance. Publish contribution expectations and a private security-reporting channel.
+- Perform a secret/history audit with redacted reporting before making existing history public. This assessment intentionally did not inspect real secret files or content-scan Git history.
+- Document known gaps honestly. Gate: clean checkout instructions are reproducible with isolated data and mock AI, and publication clearance is complete. No provider framework or database rewrite required.
+
+Stage B: portable full-feature self-host deployment.
+- Add a community Compose recipe with explicit persistent storage, private app networking, protected proxy, local secret/config locations, and optional public-share host.
+- Make frontend installation and reserve-path behavior explicit. Keep operator deployment configuration separate from source.
+- Keep model choices and feature availability clear. Missing credentials should lead to disabled/unavailable features or actionable setup errors, not a false claim that a mock demo generates images.
+- Gates: a new operator starts the documented stack without an external deployment manager or host-specific paths; authenticated online UI loads; unauthenticated library/API/raw-media access fails; optional share URLs work only for published content; data survives restart. Execute against disposable infrastructure when implementation is authorized.
+
+Stage C: verifiable release and recovery.
+- Fix the share-page test contract; include the workflow/recipe browser suites with Playwright and a modern frontend build in CI.
+- Test the artifact/configuration actually documented for users, not just the local fallback.
+- Provide a short quiesced backup and explicit pg_restore procedure, including separately protected signing/configuration material.
+- Gates: import/browse/edit/remix-save/share-recall/delete workflows pass; a restart preserves queued/ready jobs; a declared upgrade preserves IDs and data; restoration to a second disposable instance preserves originals, metadata, lineage, and supported session/share behavior.
+- Stages B and C together support a v0.1 hosting claim. They do not require any new importer or provider.
+
+Stage D: prove extensibility with mixed providers.
+- Add optional capability-specific provider settings falling back to the existing AI_PROVIDER semantics.
+- Keep provider adapters explicit ordinary modules and reuse validated output contracts.
+- Fix credit pause/probe routing at the same time, and define provider/model/dimension/prompt-content identity and regeneration rules. Record effective generation provenance rather than reconstructing it at save time.
+- Gates: existing configurations behave unchanged; OpenAI classification plus Google remix routes correctly; Google credit depletion does not pause unrelated OpenAI work; job/retry/result metadata reflects the actual effective configuration; both runtime modes report supported capabilities accurately.
+
+Stage E: prove a new source and bounded customization.
+- Implement stable folder ingestion through the compatibility helper. Specify what edits, moves, deletions, duplicate content and interrupted imports mean. Importing a file should not imply watching/deleting it automatically unless that behavior is explicitly part of the feature.
+- Gates: reruns are idempotent; adding an earlier-sorting filename imports exactly one new item; same names in separate source namespaces stay distinct; failures retry; reserve copies remain usable; existing processing/search/remix paths accept the imported items.
+- Add prompt profiles with unchanged defaults, retained structural instructions, effective version/hash provenance, and explicit metadata/embedding refresh.
+- Gates: customization survives initial and retry paths, output validates, and reprocessing updates the intended derived state.
+- Folder ingestion can proceed independently of provider routing once the ingestion contract is defined. Runtime prompt customization should follow the identity/regeneration decisions.
+
+Work deliberately deferred
+
+No plugin marketplace or dynamic plugin loader, no broad dependency-injection framework, no whole-database rename/migration merely for cleaner terminology, no local/online server rewrite, no team accounts/RBAC/billing, no object storage/search cluster, no promise of a complete PyPI GUI package or untested OS matrix. Each can become justified by a specific supported use case later.
+
+Decisions before implementation
+
+1. Confirm the initial audience; this plan assumes individual/trusted-library self-hosters. Teams would require authenticated identities and an explicit resource-ownership model.
+2. Select the code license and establish asset/publication clearance. The assessment does not select a license on the owner's behalf.
+3. Confirm the supported first distribution and platform. Recommendation: Linux/container online Compose for full application use, editable checkout for contributions, limited mock fixture demo for exploration.
+4. Treat stable public plugin/API compatibility as a future promise. Initially document current internal extension seams and contribution examples without freezing the schema or all Python functions.
+
+Verification and limits
+
+At the assessment snapshot, the parent executed tests/test_e2e.py, tests/test_hotfix_regressions.py, and tests/test_online_api.py::test_online_public_share_link_lifecycle with temporary SQLite/media fixtures, cache/bytecode writes disabled, and IPv4/IPv6 socket connections blocked: 7 passed, 1 failed in 2.21 seconds. The failing test is the caption-versus-classification-summary expectation described above. These are historical results, not failures reproduced on the current tree.
+
+The operations agent independently executed the six hotfix regression cases: 6 passed in 1.91 seconds. These overlap the parent's selection; they are not six additional unique coverage cases. The extension agent ran three isolated checks for folder identity, classification/embedding reuse, and mixed-provider availability. The release agent inspected lockfile engines and verified the installed-module frontend path calculation without building a wheel.
+
+No new full build, fresh dependency resolution, complete CI run, container boot, live proxy check, browser session, PostgreSQL concurrency/migration run, paid provider validation, actual backup/restore drill, or secret-history/asset-rights clearance was performed. Those are explicit future release gates, not results implied by the offline checks. The earlier three review findings have hotfix coverage; this roadmap does not repeat them as unfixed release defects.
+
+All three agents finished before synthesis. This historical assessment did not implement changes.

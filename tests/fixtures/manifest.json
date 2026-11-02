@@ -1,0 +1,27 @@
+{
+  "messages": [
+    {
+      "telegram_message_id": 201,
+      "caption": "when the deploy fails in production",
+      "file": "deploy-fails.ppm",
+      "mime_type": "image/x-portable-pixmap",
+      "date": "2026-01-01T00:00:00+00:00",
+      "link_preview": {
+        "url": "https://example.com/deploy-fails",
+        "display_url": "example.com/deploy-fails",
+        "site_name": "Example Memes",
+        "title": "Deploy failed reaction",
+        "description": "A preview image used when production deploys fail.",
+        "has_preview_media": true,
+        "preview_media_kind": "photo"
+      }
+    },
+    {
+      "telegram_message_id": 202,
+      "caption": "smug reaction image for a code review win",
+      "file": "smug-reaction.ppm",
+      "mime_type": "image/x-portable-pixmap",
+      "date": "2026-01-02T00:00:00+00:00"
+    }
+  ]
+}

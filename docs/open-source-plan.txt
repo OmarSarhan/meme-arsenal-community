@@ -1,0 +1,108 @@
+Meme Arsenal OSS: project scope and release plan
+
+Public source release (2026-11-02)
+- Destination: https://github.com/OmarSarhan/meme-arsenal-community, v0.1.0.
+- The public root contains the selected current source with fresh history;
+  original and development repositories remain private. No private historical
+  commits, branches, tags, notes or PR refs are part of the public history.
+- Owner setup: deploy/community/README.md. Confidential reporting: SECURITY.md.
+  Evidence and verification limits: docs/release-preparation.md. The release
+  record identifies the actual public commit and tag.
+- Provider-per-capability routing, effective-operation credit recovery,
+  derived-data identity, queued generation provenance, folder import, bounded
+  style guidance and internal extension examples are included. See
+  docs/derived-data-refresh.md, docs/source-ingestion.md and
+  docs/internal-extension-examples.md for the current contracts.
+- The sections below preserve the development plan and its historical source
+  provenance. They are not a list of additional first-release work.
+
+Purpose
+Build an opinionated, extensible meme library for individuals self-hosting their
+own instance. The first release serves one owner, protects their archive, and
+allows deliberate public sharing of selected media. It is not a hosted service
+for unrelated users or a team-permissions product.
+
+Historical starting point
+- Source: https://github.com/OmarSarhan/meme-arsenal
+- Snapshot: 9620f2b5c4d3c23956eed9f37735594d1acb5688
+- Created: 2026-11-01
+- Independent repository with a new root commit; the original Git history was
+  not imported. All 126 files tracked at that snapshot were copied before the
+  project introduction, this plan, and the assessment were added.
+- Actual environment files, credentials, Telegram sessions, reserve media,
+  databases, dependencies, and generated builds were not copied.
+- Later upstream operations changes were evaluated in the accepted
+  docs/self-hosting-decision.txt; their commit IDs record provenance.
+- deploy/community/README.md now documents the portable core. The generic
+  deploy/service examples remain external-proxy references, not fresh-install
+  instructions. Ingress, durable owner identity and bounded recovery have accepted
+  private CI evidence; docs/release-preparation.md records remaining release gates.
+- The development repository started private. The owner selected unrestricted reuse on
+  2026-11-01; first-party code and assets now use 0BSD. See docs/licensing.md for
+  asset provenance and third-party notices. The public release uses fresh history;
+  it does not publish the development repository's historical commits.
+
+Investigation
+docs/open-source-assessment.txt preserves the three-agent investigation and
+parent verification, including evidence, known limitations, and acceptance
+gates. It evaluated 345a33b plus onboarding edits later committed in 9620f2b.
+Its original test results are historical evidence, not a new test run against
+this repository. Check current code before treating any finding as unresolved.
+See docs/source-alpha-status.txt for the bounded current-tree cleanup and scan.
+The seed and subsequent development history retain inherited operational
+context. The owner selected fresh public history on 2026-11-02: retain private
+development history and publish only an approved tree in a new parentless root.
+The owner subsequently authorized the fresh public community release. Only
+approved current tracked content is exported; no private historical commits,
+branches, tags, notes or PR refs may be exported.
+
+1. Establish the source alpha
+- License decision: 0BSD. Maintain asset provenance and third-party notices,
+  contribution expectations, and a private security-reporting route.
+- Review the new repository's content for publication. Fresh history avoids
+  importing old commits but does not itself establish publication readiness.
+- Make the supported platform, setup, feature availability, and AI data flows
+  explicit. Preserve the useful developer guide and avoid competing guides.
+- Gate: a clean checkout can run the documented isolated mock workflow without
+  production secrets or services, and publication clearance is complete.
+
+2. Deliver a portable private instance
+- Provide one Compose-based full-feature deployment with the online API,
+  worker, PostgreSQL, Redis, explicit storage, and an authenticated entry point.
+- Keep local SQLite/mock tooling clearly scoped; it is not feature-equivalent
+  to the full online application. Telegram sync can be optional for users who
+  begin with uploads.
+- Configured durable owner identity now retains drafts and curation across
+  browsers and cookie loss. Follow deploy/community/README.md for provisioning
+  and recovery; this remains a single-owner deployment, without team accounts.
+- Make public sharing optional and explain which media/context goes to AI
+  providers, including private uploads and retained error records.
+- Gate: a fresh operator installs without the original host layout, accesses
+  the authenticated library, and retains data across restart. Unauthenticated
+  library/API/media access fails; selected published shares work as intended.
+
+3. Verify v0.1 workflows and recovery
+- Resolve the public-share caption/summary test contract and include modern
+  frontend workflows in the documented CI/test path.
+- Exercise import, browse, metadata edit, remix, save, share, recall, delete,
+  restart, and a declared supported upgrade using disposable data.
+- Document and prove a consistent backup and restore, including the separately
+  protected signing/configuration material needed for supported identities and
+  links. Reconcile any completed upstream backup work before duplicating it.
+- Gate: restore a second disposable instance with originals, metadata, lineage,
+  jobs, and supported owner/share behavior intact.
+
+4. Prove extensibility with concrete use cases
+- First allow mixed provider routing using the existing adapters, with coherent
+  circuit recovery, embedding/classification identity, and queued-job provenance.
+- Add stable folder ingestion when implemented; the fixture importer has
+  positional identity and is not a production folder-sync contract.
+- Add bounded prompt/style profiles with structural schemas retained in code,
+  effective prompt identity, and an explicit derived-data refresh policy.
+- Prefer narrow helpers and additive changes. A plugin framework, new provider,
+  neutral-source schema rewrite, and teams/RBAC are not first-release goals.
+
+Next milestone
+A new individual installs an isolated instance, uses their own media, and
+recovers the library from backup without help from the original operator.
+Stages 1-3 establish that claim; stage 4 demonstrates focused extensibility.

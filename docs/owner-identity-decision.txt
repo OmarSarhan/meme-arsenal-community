@@ -1,0 +1,127 @@
+Single-owner identity and recovery decision
+
+Status (2026-11-02): implemented with accepted private CI evidence; see
+release-preparation.md and deploy/community/README.md for current recovery steps.
+The design baseline and rationale below are retained.
+Source baseline: aea362783794e87ac3ea4a50a236f26e17233901.
+Deployment boundary: see self-hosting-decision.txt.
+Scope: one individual running a private library behind authenticated HTTPS.
+
+Identity and access
+
+Use one durable owner namespace, reusing the existing anonymous_sessions row and
+its curation, upload and job associations. Pin its ID in protected persistent
+operator configuration (proposed name: OWNER_SESSION_ID). It is a storage key,
+not a password or bearer credential. Do not derive it from a cookie, signing key,
+Basic Auth username, IP address, browser storage or request header. No account,
+registration, invitation, team or role system is needed.
+
+All private routes resolve this configured namespace. Caddy Basic Auth over HTTPS
+authenticates the operator; the app port remains unpublished. Do not infer owner
+authentication from a signed anonymous cookie or a caller-supplied Host/identity
+header. The optional share ingress exposes only its narrow route allowlist and
+never invokes owner resolution. This design depends on that ingress boundary;
+the bare application is not an authenticated public service.
+
+New and existing libraries
+
+Provisioning explicitly initializes a random owner namespace once and persists
+its ID. App/worker startup refuses missing, malformed or nonexistent owner
+configuration instead of silently creating a replacement library identity.
+
+For an existing library, require an operator-only, offline selection before the
+first owner-mode start: inspect a read-only inventory of IDs, dates and curation/upload/job counts, then adopt
+one identified legacy session or deliberately initialize an empty namespace.
+Adoption pins the existing ID; it does not rewrite or copy its rows. A valid old
+cookie may help identify a candidate offline, but neither a cookie nor the first
+web visitor can perform adoption. Take a consistent backup before transition.
+
+The selected session's favorites, archive flags, manual tags, notes, private
+uploads and jobs become accessible from every authenticated browser. Preserve
+media/message/job IDs, source links, files and visibility. Existing saved library
+items remain library items. Other sessions, orphaned jobs and global/CLI curation
+stay intact and separate; they are not automatically combined or exposed as owner
+data. Initial support adopts one namespace, without multi-session consolidation.
+Other namespaces require separately reviewed offline recovery. There is no web
+claim endpoint, browser account switcher, wildcard adoption or last-write-wins
+merge. This conservative limit avoids inventing ownership and resolving conflicting
+notes or favorites without operator intent.
+
+Durability and private drafts
+
+Two authenticated browsers see the same owner curation, uploaded drafts and jobs.
+Missing, invalid, expired or replaced cookies do not select a different owner.
+All private item, original, thumbnail, keyframe, playback, job-image, recipe,
+save and source-detail paths must use the same owner rule. Unselected legacy
+private sources remain inaccessible, including nested list/detail/random metadata,
+recipe content and job references. Preserve existing global server tags.
+
+Provide authenticated discovery of uploaded drafts even when no job references
+them, and retained job discovery beyond the current recent-job window. Drafts
+remain private and outside the saved-library gallery until explicitly saved.
+Saving adds an item to the private library; it does not create a public share,
+even though existing database fields call saved items public/published.
+
+Browser sessionStorage is only a workspace convenience. Unsubmitted selections,
+analysis and tweak edits need not synchronize; submitted job settings and stored
+drafts must recover from the server after browser storage is lost. A locally
+dismissed job is not deleted. Worker execution preserves the configured owner
+association across restart and only claims that namespace's eligible jobs and limits stale recovery mutations
+to that namespace;
+unselected/null legacy jobs are retained without automatic execution. Active-job
+limits apply across the owner's browsers.
+
+Recovery and sharing
+
+Back up PostgreSQL, the complete reserve including drafts, the owner namespace
+configuration, and separately protected signing/authentication material using the
+consistent backup procedure. Restore into an empty instance and validate these
+components before serving. Database and reserve recovery, not cookie recovery,
+restores owner data. Loss of owner configuration requires explicit offline
+identification of the retained namespace, never automatic selection.
+
+Keep a persistent, strong PUBLIC_SESSION_SECRET. Restoring it preserves compatible
+signed cookies and signed share URLs; it does not replace ingress credentials.
+For loss or rotation, install a fresh strong secret consistently and restart the
+relevant processes. Owner data and job ownership remain unchanged. Old signed
+cookies and signed share URLs fail validation; no fallback-key scheme is needed.
+Database-backed short share codes survive key rotation while their shares remain
+active. Rotation is therefore not share recall: explicitly recall unwanted links.
+Changing/resetting Basic Auth credentials also leaves ownership unchanged. A
+restore of an older backup can restore old active-share state; keep the share
+host disabled until that state has been reviewed.
+
+Public sharing stays disabled by default and requires explicit enablement plus
+an item share action. Public visitors receive only active authorized share
+content, never owner curation or drafts. Sharing a remix output does not authorize
+its private source originals, descriptions or recipe snapshots. Explicit recipe
+publication must authorize the supported source presentation. Every public route,
+alias and query variant must enforce that grant without exposing unapproved
+drafts, private originals, unselected namespaces or owner curation, including
+through descriptions and snapshots. Status lookup and private preview must not
+expand publication scope. The optional-sharing implementation defines recipe
+content eligibility and the effects of source recall, deletion and privatization;
+this owner decision does not require separate source shares or whole-card denial.
+Keep sharing gated until that policy is implemented and verified.
+
+Required acceptance checks
+
+- Two authenticated browsers, cookie deletion, invalid cookies and restart retain
+  identical curation and access to standalone uploads, jobs and their private media.
+- Adoption of session A preserves its IDs/data; session B and null-owned jobs
+  remain unchanged and inaccessible. Repeated setup is safe; ambiguous selection,
+  missing owner configuration and attempted web claiming cannot silently proceed.
+  Include foreign stale jobs/attempts and nested source metadata in isolation checks.
+- Unauthenticated private requests fail at ingress; public share visitors cannot
+  reach owner APIs, raw media or drafts with any cookie, spoofed header or method.
+- Output-only shares and private preview do not grant recipe/source access;
+  explicit publication, recall, deletion and privatization follow the verified
+  sharing policy. Save alone does not publish or create a share.
+- Preserved/replaced signing keys, preserved/lost browser storage and restored
+  short-code records produce the recovery behavior above without changing IDs.
+- Isolated PostgreSQL concurrency/restart checks preserve job ownership and limits
+  without blocking gallery reads; restored DB/reserve/config recover the library.
+
+Use disposable fixture data and deterministic provider/queue stubs. No live data,
+provider calls or Telegram activity belongs in these automated checks. This design
+review traced committed source only; it does not claim these new checks have run.

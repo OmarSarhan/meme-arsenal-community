@@ -1,0 +1,51 @@
+{
+  "model": "gemini-3.1-flash-image",
+  "direction": "original dashboard icons with Tumblr-2017-inspired restraint, no logo copying",
+  "icons": [
+    {
+      "slug": "arsenal-mark",
+      "path": "frontend/dashboard/src/assets/dashboard-icons/arsenal-mark.png",
+      "size": [
+        512,
+        512
+      ],
+      "concept": "Brand/app mark. A custom abstract MA-adjacent monogram is allowed, but it must be original and not literal text-heavy: a bold archive tray shape holding two stacked media cards, forming a memorable blocky mark through negative space."
+    },
+    {
+      "slug": "gallery-grid",
+      "path": "frontend/dashboard/src/assets/dashboard-icons/gallery-grid.png",
+      "size": [
+        512,
+        512
+      ],
+      "concept": "Gallery view. A confident four-tile media grid with one lifted tile and a tiny indexing notch, like a curated visual wall for saved media."
+    },
+    {
+      "slug": "semantic-search",
+      "path": "frontend/dashboard/src/assets/dashboard-icons/semantic-search.png",
+      "size": [
+        512,
+        512
+      ],
+      "concept": "Search view. A bold magnifier fused with one media card and three small semantic match nodes, meaning search by vibe and meaning rather than plain text."
+    },
+    {
+      "slug": "remix-spark",
+      "path": "frontend/dashboard/src/assets/dashboard-icons/remix-spark.png",
+      "size": [
+        512,
+        512
+      ],
+      "concept": "Two source media cards at left and right fold inward through one controlled angular sparkle/prism into a single generated card at the bottom center. Clean synthesis, minimal burst, not chaotic."
+    },
+    {
+      "slug": "source-trace",
+      "path": "frontend/dashboard/src/assets/dashboard-icons/source-trace.png",
+      "size": [
+        512,
+        512
+      ],
+      "concept": "Two small source thumbnail cards branch through clean thin trace lines into one final generated card. Use the same off-white field and dark outline language as the gallery/search icons. Emphasize provenance and lineage."
+    }
+  ]
+}

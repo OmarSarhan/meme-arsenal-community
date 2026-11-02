@@ -1,0 +1,125 @@
+Source-alpha status: updated 2026-11-02
+
+Starting snapshot: d791900005db4ef66cf93c3024251434461f58bd
+Release scope and next milestones: docs/open-source-plan.txt
+
+Public source addendum (2026-11-02; historical audit below preserved)
+- Authenticated ingress, configured durable single-owner identity across browsers,
+  and explicit opt-in sharing are implemented; current procedures are in
+  deploy/community/README.md and docs/opt-in-sharing.md.
+- Restored app/worker activation and development-schema 012->013 recovery have
+  accepted private CI evidence (docs/release-preparation.md); historical released
+  upgrades remain unestablished.
+- Public source: https://github.com/OmarSarhan/meme-arsenal-community, v0.1.0,
+  with fresh history from the selected current tree. Original and development
+  repositories remain private. SECURITY.md records enabled confidential reporting
+  and its verified public action; docs/release-preparation.md records evidence
+  and limits. The release record supplies the final public commit/tag identities.
+- Everything below is dated source-alpha history, including gates that were
+  unresolved at those earlier checkpoints. It is not the current release status.
+
+Completed in the 2026-11-01 kickoff (historical evidence)
+- Selected 0BSD under the owner's authorization for unrestricted reuse.
+- Added the license to Python/npm metadata and the Docker build inputs.
+- Recorded bundled asset provenance and the scope of third-party licensing.
+- Enabled Vite's bundled-dependency license file. The built output contains
+  React, React DOM, scheduler, Lucide ISC, and the Feather MIT notices.
+- Added contribution and AI/privacy guidance, and stated the initial Linux,
+  Python 3.12, Node 22.12+ development target and runtime-mode limits.
+
+Initial publication inspection (2026-11-01; limited historical scan)
+- The initial OSS repository had one commit and 128 historical blobs.
+- A targeted scan inspected those blobs and 133 current source/documentation
+  files at the time of the scan. No matches were found for private-key blocks,
+  GitHub/Google/OpenAI token formats, AWS access-key IDs, or credential-bearing
+  HTTP URLs. No tracked real environment, database, or session files were found.
+- This was a limited pattern scan, not proof that every possible secret or
+  sensitive datum has been detected. Ignored runtime files and the original
+  private repository's history were not inspected or copied.
+- That inspection left inherited operational context in the deployment examples
+  and runbook. The current-tree cleanup below addresses those files. The seed
+  and later development history still contain the old versions; editing the
+  current tree alone does not remove them.
+
+Current-tree publication cleanup (2026-11-02)
+- Baseline: 22feeaeab7535412c4981ec7047e400267ec7c13, including the community core.
+  Generalized legacy host/domain/storage/secret examples and operations; removed
+  private tracker and transient workspace context from public-facing docs.
+  Local reserve now defaults to ./meme-arsenal-reserve with derived SQLite;
+  explicit settings and container /reserve remain supported. No data was moved.
+- New installations start at deploy/community/README.md. Its supplied PR #5 CI
+  evidence is recorded in deploy/community/verification.txt, separately from
+  checks run for this cleanup. Authenticated ingress, durable owner identity,
+  opt-in sharing and recovery remain gates.
+- Bounded scan: all 145 tracked paths inventoried, 138 UTF-8 text files scanned,
+  including new community files; seven media payloads were not opened (five
+  generated icons and two PPM fixtures). Existing licensing/fixture provenance
+  was retained. No risky real-secret/data filenames or known original host,
+  volume, workspace or private tracker references remained in current text.
+- Redacted credential-pattern and assignment review found no genuine credential
+  exposure. Five credential-URL candidates were disposable CI/test values and
+  the initializer's generated URL template. Pattern scans cannot prove absence
+  of every secret or private datum. Ignored/untracked data, real env/secret files,
+  media metadata/content, remote-only/hidden/unreachable refs, hosted artifacts,
+  release assets and external services were not inspected.
+- 26 targeted offline checks passed: tests/test_config_db.py (13),
+  tests/test_online_architecture_docs.py (2), tests/test_community_deploy.py (11).
+  They used isolated temporary HOME/data, clean inherited settings, OSS src first,
+  disabled bytecode/pytest cache, and blocked socket connections. Ruff passed
+  for changed Python files. The existing Alembic/SQLite deprecation warnings
+  remain. No builds, package installs, containers or live integrations ran here.
+- Static checks preserved seven legacy secret names/consumers, mount refusal,
+  the share allowlist and unchanged backup helper; checked 118 local Markdown
+  links, fixture references, 14 architecture labels and 15 required routes.
+  Legacy Compose config resolved synthetic paths and rejected missing secret-dir
+  configuration without a daemon connection. Shell syntax passed for the 12
+  architecture command blocks and unchanged backup helper.
+  The cleaned commit and final inventory accompany the cleanup PR. This is
+  current-tree work, not clearance of every historical ref.
+
+- Independent review found a relative-path regression at the npm subprocess
+  boundary. Both dashboard builders now resolve the output directory before
+  changing subprocess cwd. Four offline default-settings/build-mode cases
+  reproduced the missing-assets failure and passed after the correction.
+
+Historical history/publication decision (before the owner's fresh-root choice)
+- The initial OSS seed and subsequent reachable development commits retain old
+  operational context in deploy/service examples, docs/online-architecture.md,
+  preparation docs and the former configuration default. No history was changed.
+- Preferred boundary: seed a separate publication repository from the final
+  reviewed clean tree while keeping development history private. Alternatively,
+  authorize a separately planned all-ref history sanitation and re-audit.
+  Retaining history requires explicit acceptance of the identified operational
+  disclosure; that is an exception to the private-context criterion.
+- Intended public refs have not yet been selected. Hidden/unreachable/server-only
+  refs and remote-only branches/tags are not cleared by this current-tree check.
+
+Historical remaining source-alpha gates
+- OMA-14: finish the content/history publication review and remove private
+  operational context from the intended public distribution.
+- OMA-15: verify a confidential vulnerability-reporting route before public
+  release. GitHub's private-vulnerability-reporting API returned HTTP 404 for
+  the current private repository; SECURITY.md does not claim it is enabled.
+- OMA-16: reproduce a complete fresh-checkout mock workflow with the modern UI.
+  This batch reused an existing matching npm dependency installation. Its build
+  is not a clean install test, browser interaction test, or full runtime test.
+- Portable authenticated deployment, durable owner identity, recovery, and the
+  supported hosting release remain later milestones in the release plan.
+
+Kickoff validation scope (2026-11-01; not rerun here)
+- TypeScript and the Vite production build passed; generated dependency notices
+  were checked for the expected packages and copyright notices.
+- Python/npm license metadata and lockfile agreement were checked, along with
+  the Dockerfile's inclusion of LICENSE before package installation.
+- Nine existing configuration, CLI, and fixture end-to-end checks passed using
+  isolated SQLite data with outbound sockets blocked (Python 3.14.4, pytest
+  9.1.1). The fixture test exercises the fallback dashboard; the separate Vite
+  build validates the modern frontend build, not browser interaction. An initial
+  harness run omitted alembic.ini; adding the repository's migration config to
+  the isolated working directory resolved that harness error.
+- No dependency versions changed. No packages were installed from a registry.
+- No wheel or container was built, and no production service, database, Telegram
+  account, or AI provider was contacted. The repository remains private.
+
+The accepted docs/self-hosting-decision.txt records the selected upstream
+operations changes and their provenance. It does not claim recovery verification.

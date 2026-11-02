@@ -1,0 +1,77 @@
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+deploy/service/env.production
+deploy/service/secrets/*
+!deploy/service/secrets/.gitkeep
+config.yaml
+config.local.yaml
+config.yml
+deploy/community/config/
+deploy/community/secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.eggs/
+build/
+dist/
+*.whl
+
+# Python tooling
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pytest_cache/
+.pytest_cache
+.mypy_cache/
+.ruff_cache/
+.ruff_cache
+.tox/
+.nox/
+
+# Node / Vite
+node_modules/
+**/node_modules/
+**/.vite/
+**/dist/
+coverage/
+
+# Meme Arsenal local reserve data
+meme-arsenal-reserve
+meme-arsenal-reserve/
+state/
+backups/
+*.sqlite
+*.sqlite3
+*.db
+*.session
+*.session-journal
+
+# Logs and temporary files
+*.log
+*.bak
+logs/
+tmp/
+temp/
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/*
+!.vscode/extensions.json
