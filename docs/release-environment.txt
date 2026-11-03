@@ -1,5 +1,9 @@
 Observed private community test environment — 2026-11-02
 
+Historical inventory only. Do not install these versions as a replacement for
+the reviewed release's manifests. This records one test environment, not current
+vendor availability, a lockfile or a downloadable image.
+
 Tested head: 06eeafba21f1185063d1fddbc0fb0c8c26f9aa30
 CI checkout: bb5555492e77c00f223ab557330ee351df6c5ef5 (content-equal)
 Tree: 6cf887fcb6016a943faa2d3b80dea86d49c49c78

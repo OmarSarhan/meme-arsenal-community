@@ -15,9 +15,8 @@ app and its [complete recovery procedure](../deploy/community/README.md#restore-
 for existing data. Local tooling initialization is described in the
 [developer guide](../docs/development.md#first-local-setup). Keep reserve data private.
 
-Create or link the real reserve locally when running local tooling:
-
-From the repository root (this creates only the directory, not its database):
+For local tooling, create or link the real reserve. From the repository root,
+run the following to create the directory (but not its database):
 
 ```bash
 mkdir -p meme-arsenal-reserve

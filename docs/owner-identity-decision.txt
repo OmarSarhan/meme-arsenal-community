@@ -2,7 +2,8 @@ Single-owner identity and recovery decision
 
 Status (2026-11-02): implemented with accepted private CI evidence; see
 release-preparation.md and deploy/community/README.md for current recovery steps.
-The design baseline and rationale below are retained.
+The design baseline below is historical. Use the community guide for commands;
+references to proposed behavior describe the decision, not unfinished current work.
 Source baseline: aea362783794e87ac3ea4a50a236f26e17233901.
 Deployment boundary: see self-hosting-decision.txt.
 Scope: one individual running a private library behind authenticated HTTPS.
@@ -11,7 +12,7 @@ Identity and access
 
 Use one durable owner namespace, reusing the existing anonymous_sessions row and
 its curation, upload and job associations. Pin its ID in protected persistent
-operator configuration (proposed name: OWNER_SESSION_ID). It is a storage key,
+operator configuration (implemented as OWNER_SESSION_ID / OWNER_SESSION_ID_FILE). It is a storage key,
 not a password or bearer credential. Do not derive it from a cookie, signing key,
 Basic Auth username, IP address, browser storage or request header. No account,
 registration, invitation, team or role system is needed.

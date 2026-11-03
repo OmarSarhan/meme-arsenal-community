@@ -1,23 +1,16 @@
 # Security reporting
 
-Report vulnerabilities through GitHub's
+Report vulnerabilities through the public repository's
 [confidential reporting form](https://github.com/OmarSarhan/meme-arsenal-community/security/advisories/new).
-Sign in to GitHub, then use **Security → Report a vulnerability**. Do not post
-sensitive exploit details, credentials, sessions, database dumps, or personal
-media in public issues. If the confidential route is unavailable, keep those
-details private rather than opening a public report.
+Do not post sensitive exploit details in public issues or include credentials,
+sessions, database dumps or personal media.
 
-The initial release is v0.1.0. Include the exact version or commit and whether
-you use the supported Linux amd64 community Compose deployment or local tooling.
-See [release evidence and limits](docs/release-preparation.md) for the tested scope.
-
-Reporting verification: on 2026-11-02, the release coordinator enabled private
-vulnerability reporting for `OmarSarhan/meme-arsenal-community` and confirmed the
-API returned `enabled: true`. Unauthenticated, cookie-free requests to its public
-Security and Advisories pages returned the **Report a vulnerability** action.
-Following that action reached GitHub sign-in with the reporting destination
-preserved. This verifies public action availability; no authenticated reporter
-form submission or synthetic vulnerability report was performed.
+The release coordinator verified GitHub's private-reporting API setting as
+enabled on 2026-11-03. The 2026-11-02 unauthenticated browser check found
+**Report a vulnerability** under Security/Advisories and reached sign-in with
+the reporting destination preserved. No authenticated submission was tested.
+The November 3 recheck covered the API setting only. If the form is unavailable,
+withhold sensitive details until a confidential route is available.
 
 Include the affected commit, deployment mode, a minimal reproduction using
 synthetic data, and the observed impact. The current trust model and provider

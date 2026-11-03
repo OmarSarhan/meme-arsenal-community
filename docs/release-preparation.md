@@ -6,6 +6,20 @@ Public history starts from the selected current source in a new parentless root;
 the original and development repositories remain private. The GitHub release
 record supplies the actual public commit/tag and any public CI outcomes.
 
+**Historical evidence, recorded November 2, 2026.** Public source now lives in
+[meme-arsenal-community](https://github.com/OmarSarhan/meme-arsenal-community).
+The status, pending gates, private commit IDs and test counts below describe
+their recorded snapshots. They do not certify later releases. For installation
+use the [community guide](../deploy/community/README.md); for confidential reports
+use [SECURITY.md](../SECURITY.md).
+
+Release exports must preserve separate public history. Export approved tracked
+content only, record the private-candidate/public-commit/tag mapping, and check
+the public tree and refs. Never push private development history to the public
+repository. Later public releases build on public history, without importing
+private historical commits or refs.
+
+
 This page preserves dated private test evidence and its limits. Private commit
 IDs and CI links are provenance, not public source history or a claim that the
 new public root has already run those tests. Current confidential reporting and

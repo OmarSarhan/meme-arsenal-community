@@ -26,22 +26,12 @@ the private library; explicit output/recipe grants control external sharing.
 The remaining sections explain schema, routes, workers and trust, followed by
 legacy external-proxy operations requiring reviewed adaptation.
 
-Read [System Overview](#system-overview) and [Public And Private Boundaries](#public-and-private-boundaries)
-first. Community operators use the linked canonical procedures above. Existing
-legacy operators can consult [Environment Variables](#environment-variables),
-[First Deploy](#first-deploy), [Update Deploy](#update-deploy), and
-[Health Checks](#health-checks) as reference. Legacy recovery starts at [Backup](#backup),
-[Restore](#restore), and [Rollback](#rollback). Commands below operate on the
-hosted stack and its persistent data; they are not onboarding smoke tests.
-
-This document describes the online runtime and generic operator procedures.
-The browser talks to FastAPI APIs backed by PostgreSQL; static catalog exports
-remain local/offline tooling. New installs start with the
-[community core recipe](../deploy/community/README.md), which supplies
-authenticated ingress, durable owner identity and bounded recovery procedures.
-See [release preparation evidence](release-preparation.md) for tested identities,
-recovery limits and remaining public-release gates. The retained
-`deploy/service` examples assume an operator-managed authenticated proxy.
+Read [System Overview](#system-overview) and
+[Public And Private Boundaries](#public-and-private-boundaries) first. The browser
+uses FastAPI and PostgreSQL; static catalog exports are local tooling. The
+`deploy/service` sections below assume an existing authenticated external proxy
+and need review before use. Their commands change persistent data. For tested
+snapshots and recovery limits, see [release evidence](release-preparation.md).
 
 ## System Overview
 
@@ -198,7 +188,7 @@ saved settings, draft recipe previews, saved page sharing and revocation, media
 downloads, deletion versus scrapping,
 compact blocked-item controls, and retrying a failed save from the gallery.
 
-Public after Basic Auth:
+Available after Basic Auth:
 
 - `/`
 - `/arsenal-config.json`

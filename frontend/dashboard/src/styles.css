@@ -540,6 +540,15 @@ button {
   text-transform: uppercase;
 }
 
+.brandVersion {
+  margin-left: 4px;
+  color: var(--ink-muted);
+  font-size: 0.65rem;
+  font-weight: 400;
+  text-transform: none;
+  white-space: nowrap;
+}
+
 .brand span,
 .sectionBar span,
 .itemTopline,

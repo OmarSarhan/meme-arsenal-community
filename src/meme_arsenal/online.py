@@ -199,7 +199,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     ensure_reserve_layout(settings)
     engine = get_engine(settings)
 
-    app = FastAPI(title="Meme Arsenal Online", version="0.1.0")
+    app = FastAPI(title="Meme Arsenal Online", version="0.1.1")
     app.state.runtime = RuntimeState(settings, engine)
     app.add_middleware(
         CORSMiddleware,
@@ -2280,16 +2280,16 @@ def _remix_media_item_or_404(
     media_item = db.get(MediaItem, media_item_id)
     if media_item is None:
         raise HTTPException(status_code=404, detail="Item not found")
+    # Authorize before revealing readiness or checking files for private uploads.
+    if not (media_item.public_status == "published" and media_item.visibility == "public"):
+        if media_item.origin != DASHBOARD_UPLOAD_ORIGIN:
+            raise HTTPException(status_code=404, detail="Item not found")
+        message = db.get(TelegramMessage, media_item.telegram_message_id)
+        if message is None or message.chat_id != _upload_chat_id(session_id):
+            raise HTTPException(status_code=404, detail="Item not found")
     if media_item.processing_status != "processed":
         raise HTTPException(status_code=400, detail="Source media is not ready yet")
     if not _media_item_is_available(settings, media_item):
-        raise HTTPException(status_code=404, detail="Item not found")
-    if media_item.public_status == "published" and media_item.visibility == "public":
-        return media_item
-    if media_item.origin != DASHBOARD_UPLOAD_ORIGIN:
-        raise HTTPException(status_code=404, detail="Item not found")
-    message = db.get(TelegramMessage, media_item.telegram_message_id)
-    if message is None or message.chat_id != _upload_chat_id(session_id):
         raise HTTPException(status_code=404, detail="Item not found")
     return media_item
 

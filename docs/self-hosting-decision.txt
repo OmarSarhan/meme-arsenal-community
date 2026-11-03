@@ -2,13 +2,14 @@ Self-hosting deployment decision
 
 Status (2026-11-02): portable recipe and bounded runtime verification accepted
 privately; see release-preparation.md for evidence and remaining release gates.
-Install using deploy/community/README.md. The design baseline below is retained.
+Install using deploy/community/README.md. The design baseline below is historical;
+its pending requirements are not a current list of missing features.
 Scope: one individual operating a private meme library, with optional sharing and
 Telegram sync. Evidence baseline: OSS aea362783794e87ac3ea4a50a236f26e17233901.
 
 Platform, services and startup
 
-The first target is Linux amd64 with Docker Engine and Compose v2, built from a
+The selected target is Linux amd64 with Docker Engine and Compose v2, built from a
 declared source checkout. Record the tested Engine/Compose versions with the
 release. Other platforms, published images, Kubernetes and SQLite parity are not
 part of this initial support claim.

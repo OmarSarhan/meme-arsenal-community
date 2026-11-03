@@ -1,4 +1,11 @@
-Source-alpha status: updated 2026-11-02
+Source-alpha audit history — 2026-11-01 to 2026-11-02
+
+Reader note — 2026-11-03: this file preserves the original scans, test results
+and then-open gates. It is not a current release checklist. Public source now
+lives at https://github.com/OmarSarhan/meme-arsenal-community . Use README.md for
+current setup, SECURITY.md for confidential reporting and release-preparation.md
+for the later private evidence. None of these historical scans clears later
+changes or permits publishing private development history.
 
 Starting snapshot: d791900005db4ef66cf93c3024251434461f58bd
 Release scope and next milestones: docs/open-source-plan.txt

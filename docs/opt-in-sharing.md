@@ -12,9 +12,9 @@ generation. Take the documented consistent private backup before migrating.
 
 ## Configure sharing and manage links
 
-Use the item sharing controls to inspect status, publish output or recipe, and
-recall links. Recipe recall withdraws that recipe grant; standalone source recall
-is independent.
+Use the item sharing controls to check status, publish an output or recipe, and
+recall links. Recalling a recipe withdraws its grant. Recalling a separately
+shared source is independent.
 
 `PUBLIC_SHARING_ENABLED=false` is the default and emergency stop. It blocks
 publication and capability serving, while library save, download, private recipe
@@ -78,7 +78,7 @@ requires this maintenance boundary, including later enable/disable toggles:
 
 ## Grant, recall and restored-state reference
 
-Publish page explicitly includes eligible saved sources' previews, descriptions
+Publishing a recipe page explicitly includes eligible saved sources' previews, descriptions
 and permitted browser video presentation. Separate source shares are unnecessary.
 GET status and private preview do not publish. Fixed A/B consent cannot acquire
 new sources or original permissions on later edits. Summaries and eligible media

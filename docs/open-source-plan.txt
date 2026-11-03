@@ -1,4 +1,4 @@
-Meme Arsenal OSS: project scope and release plan
+Meme Arsenal OSS: scope and release history
 
 Public source release (2026-11-02)
 - Destination: https://github.com/OmarSarhan/meme-arsenal-community, v0.1.0.
@@ -16,7 +16,25 @@ Public source release (2026-11-02)
 - The sections below preserve the development plan and its historical source
   provenance. They are not a list of additional first-release work.
 
-Purpose
+
+Reader note — 2026-11-03
+Public source is now published at:
+https://github.com/OmarSarhan/meme-arsenal-community
+Use its releases for published versions and deploy/community/README.md for setup.
+The plan below records the November 1–2 development decisions. Statements about
+pending publication or unimplemented features describe that period. Current
+provider routing, folder import and style guidance are documented in README.md,
+docs/source-ingestion.md and docs/derived-data-refresh.md.
+
+Release boundary
+Keep private development history private. Export only the approved tracked tree
+into separate public history; never push private branches, tags, notes, PR refs
+or historical Git objects to the public repository. For later releases, apply the
+reviewed tree changes on public history. Record private candidate, public commit,
+tag and checks separately. A public commit does not inherit private test evidence
+merely because it was exported from a tested tree.
+
+Original purpose
 Build an opinionated, extensible meme library for individuals self-hosting their
 own instance. The first release serves one owner, protects their archive, and
 allows deliberate public sharing of selected media. It is not a hosted service
@@ -42,7 +60,7 @@ Historical starting point
   asset provenance and third-party notices. The public release uses fresh history;
   it does not publish the development repository's historical commits.
 
-Investigation
+Historical investigation
 docs/open-source-assessment.txt preserves the three-agent investigation and
 parent verification, including evidence, known limitations, and acceptance
 gates. It evaluated 345a33b plus onboarding edits later committed in 9620f2b.

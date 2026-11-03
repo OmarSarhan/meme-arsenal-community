@@ -1,9 +1,8 @@
 # Developer guide
 
-Use this guide to make focused source changes with synthetic data. For example,
-change a CLI help message in `src/meme_arsenal/cli.py`, inspect its cases in
-`tests/test_cli.py`, then run `python -m pytest tests/test_cli.py` after the
-installation below. Review the diff and report the exact result.
+Use synthetic data for source changes. After installing the tools below, change
+one behavior, run its focused tests, and review the diff. For a CLI change, start
+with `src/meme_arsenal/cli.py` and `python -m pytest tests/test_cli.py`.
 
 The [community guide](../deploy/community/README.md#upload-first-setup) is the
 full owner-app route. A contributor checkout installs editable tools; the
@@ -96,9 +95,8 @@ connection attempts; the interactive commands above do not impose that isolation
 
 ## Common edit and check loop
 
-Choose one behavior and its focused tests, make the change, run the relevant
-check, then inspect the diff before widening scope. Use temporary data and mock
-request boundaries. Never point contributor commands at a running library.
+Use temporary data and mocked provider calls. Never point contributor commands
+at a running library. Record the checks you ran and any skips or limitations.
 
 ## Where to make changes
 
