@@ -19,7 +19,7 @@ Telegram and paid providers are optional; the recommended first run uses mock AI
 
 Follow the phases below in order for a **new instance only**. First success is
 an uploaded, privately saved item found by its edited description after reload.
-This is the primary owner guide for the v0.1.0 source release. See
+This is the primary owner guide for the v0.1.1 source release. See
 [release evidence](../../docs/release-preparation.md) and
 [verification](verification.txt) for tested snapshots and limits.
 
@@ -30,9 +30,9 @@ cover acquiring a server, installing Docker, or provisioning mounts, DNS and
 firewall rules. Establish the prerequisites below before initialization; stop
 if you cannot verify them.
 
-- Obtain the v0.1.0 source with the [README clone commands](../../README.md).
-  Work from that checkout's repository root (containing `Dockerfile` and
-  `deploy/community`).
+- Obtain a reviewed release from
+  [the public source repository](https://github.com/OmarSarhan/meme-arsenal-community).
+  Work from that checkout's root (containing `Dockerfile` and `deploy/community`).
   Record the selected revision with `git rev-parse HEAD`.
 - Use Linux amd64, rootful Docker Engine, Compose **2.30+** (raw env files), and
   Python **3.11+** for the standard-library initializer; no host Python packages
@@ -260,6 +260,9 @@ After this works, configure [providers](#provider-capabilities),
 only if wanted. Provider changes can send media and metadata outside your host.
 
 ## Provider capabilities
+
+Keep mock AI for the first upload/save check. Enable live operations only after
+reviewing the data they send and the models and credentials they require.
 
 For optional live operation, put the provider key in a mode-0600 file under the
 instance's `secrets` directory and select compatible models and the corresponding
@@ -506,6 +509,29 @@ recovery boundary, including retained owner identity. The legacy
 Before upgrading an existing database, read [the opt-in sharing transition](../../docs/opt-in-sharing.md).
 Migration 013 recalls every legacy share, including output links. Back up first;
 deliberate republication creates new links. Sharing remains disabled by default.
+
+## Plan an upgrade
+
+The new-instance setup is not an existing-library upgrade command. Read the
+target release notes and migration changes before choosing an upgrade path.
+The evidence below covers one development-schema transition, not arbitrary
+released-version upgrades or downgrades.
+
+1. Record the current source revision, exact app/DB images, project, ordered
+   Compose files and running roles. Retain the images and matching source as
+   described under restore.
+2. Take a complete private backup and verify its completion. The backup helper
+   resumes previously running services; it does not leave an upgrade window open.
+3. Before changing images, configuration or schema, repeat the
+   [graceful maintenance boundary](#deliberate-credentialconfig-changes). Keep
+   ingress off and external writers suspended until the upgrade is validated.
+4. Apply only the target release's reviewed migration and configuration steps.
+   On failure, leave writers and ingress off and investigate. An older app image
+   is usable only with a compatible schema; do not assume Alembic downgrade works.
+5. Restore only previously running roles, verify app health, dashboard assets,
+   media and owner data, then restore ingress last. If recovery is needed, use
+   the matching backup/images in a new empty instance and review restored shares
+   before enabling public access.
 
 ## Restore to a disposable empty instance
 

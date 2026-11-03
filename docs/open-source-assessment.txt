@@ -2,9 +2,14 @@ Meme Arsenal: investigated open-source route
 
 Historical assessment: source commit 345a33b3defab37c55b5a13ce6e0dc373750a138 and onboarding documentation/CLI edits later committed in 9620f2b5c4d3c23956eed9f37735594d1acb5688. Findings and line numbers below describe that snapshot, not current release readiness. The 2026-11-02 publication cleanup generalizes operational context while retaining historical results and limitations; see source-alpha-status.txt for later evidence.
 
-Three focused agents independently investigated (1) release/onboarding/distribution, (2) extension architecture, and (3) trust/privacy/operations. The parent cross-checked important claims and ran a small offline test selection. All read the Karpathy guidance; no applicable repository AGENTS.md/CODEX.md was found. All work stayed within this project. No production service, live database, real environment/secret file, provider API, Telegram account, or deployment was accessed. No installations, builds, or tracked-file changes were made.
+The review covered setup/distribution, extension architecture, and privacy/recovery.
+It checked selected claims against code and ran the offline tests recorded below.
+It used no production service, live database, real secret file, provider API,
+Telegram account or deployment. No installations, builds or tracked-file changes
+were made during that assessment.
 
-Working audience assumption: technically comfortable individuals self-hosting a single trusted library. The user was invited to choose individuals, extension developers, or teams; no choice had arrived when this report was prepared. If teams are the target, the identity and ownership work below becomes a different product milestone.
+The assessment assumed technically comfortable individuals hosting one trusted
+library. Team access would require separate identity and ownership work.
 
 Recommendation
 

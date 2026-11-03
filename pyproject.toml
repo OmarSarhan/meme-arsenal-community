@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "meme-arsenal"
-version = "0.1.0"
+version = "0.1.1"
 description = "Incremental Telegram Saved Messages meme importer with AI metadata and static dashboard export."
 readme = "README.md"
 license = "0BSD"

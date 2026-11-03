@@ -15,11 +15,11 @@ the [limited SQLite/static mock demo](docs/development.md#no-account-local-demo)
 it does not demonstrate the installed owner app.
 
 Public source: [OmarSarhan/meme-arsenal-community](https://github.com/OmarSarhan/meme-arsenal-community).
-Version **v0.1.0** is a source-built release for Linux amd64 with rootful Docker
+Version **v0.1.1** is a source-built release for Linux amd64 with rootful Docker
 and Compose 2.30+. No prebuilt container image or wheel is published.
 
 ```bash
-git clone --branch v0.1.0 https://github.com/OmarSarhan/meme-arsenal-community.git
+git clone --branch v0.1.1 https://github.com/OmarSarhan/meme-arsenal-community.git
 cd meme-arsenal-community
 git rev-parse HEAD
 ```
@@ -42,8 +42,8 @@ for provenance and third-party licenses. Your imported media retains its own rig
 The sections below retain local CLI and Telegram reference material for development
 and optional imports. They are not prerequisites for the owner app above.
 
-The repo is the tool. The **Meme Arsenal Reserve** is the product data folder. By
-local default it lives under the current working directory at:
+The **Meme Arsenal Reserve** is the data folder. By default, local commands use
+this folder under the current working directory:
 
 ```text
 meme-arsenal-reserve/
@@ -118,7 +118,7 @@ arsenal sync --limit 100
 7. Serve the local dashboard:
 
 ```bash
-arsenal serve-dashboard --host 0.0.0.0 --port 8123
+arsenal serve-dashboard --host 127.0.0.1 --port 8123
 ```
 
 Open:
@@ -168,8 +168,12 @@ Changing settings does not move an existing library; keep its explicit paths.
 
 ## Configuration
 
-Configuration is loaded from defaults, `config.yaml` if present, `.env`, and
-environment variables. For local tooling, `.env` is usually enough; the owner app uses its external instance configuration.
+Settings load in order: defaults, the first existing YAML candidate (`--config`,
+`config.yaml`, `config.yml`), `env`, `.env`, then environment variables. Later
+values override earlier ones. Secret-file settings use the `*_FILE` suffix;
+see [the loader](src/meme_arsenal/config.py) for field-specific empty-value rules.
+For local commands, `.env` is usually enough. The owner app uses its external
+instance configuration.
 
 Optional bounded operator style guidance and its private result identity, retention
 and refresh implications are described in [derived data and refresh](docs/derived-data-refresh.md).
@@ -183,8 +187,9 @@ TELEGRAM_API_HASH=your_api_hash
 AI_PROVIDER=mock
 ```
 
-Use `AI_PROVIDER=mock` with no live capability overrides and no retained live remix work for offline smoke runs and tests. Use a live provider for
-useful classification and embeddings:
+For offline smoke runs and tests, use `AI_PROVIDER=mock` with no live capability
+overrides or retained live remix work. Use a live provider for useful
+classification and embeddings:
 
 ```bash
 AI_PROVIDER=google
@@ -201,7 +206,7 @@ AI_PROVIDER=openai
 OPENAI_API_KEY=your_key
 ```
 
-Useful AI tuning knobs:
+Example AI settings (choices, not a list of defaults):
 
 ```bash
 AI_MODEL=gemini-2.5-flash
@@ -270,10 +275,10 @@ arsenal export-catalog
 arsenal build-dashboard
 ```
 
-Serve the live dashboard with remix API support:
+Serve the local dashboard with remix API support:
 
 ```bash
-arsenal serve-dashboard --host 0.0.0.0 --port 8123
+arsenal serve-dashboard --host 127.0.0.1 --port 8123
 ```
 
 Run semantic search and export a static result bundle:
@@ -350,7 +355,7 @@ Serve it with the built-in server so the app can load sibling `catalog/` and
 `media/` paths without exposing private reserve data:
 
 ```bash
-arsenal serve-dashboard --host 0.0.0.0 --port 8123
+arsenal serve-dashboard --host 127.0.0.1 --port 8123
 ```
 
 Then open:
@@ -359,8 +364,8 @@ Then open:
 http://127.0.0.1:8123/dashboard/dist/
 ```
 
-The dashboard output is static for local browsing, and `arsenal serve-dashboard`
-serves only the local dashboard and catalog/media slices needed by that shell.
+Local browsing uses an exported snapshot. Rebuild it after CLI changes with
+`arsenal export-catalog` and `arsenal build-dashboard`.
 
 The dashboard includes:
 
@@ -390,15 +395,12 @@ intentionally hidden from the dashboard action area.
 
 ## Local vs Live Dashboard
 
-Use the local dashboard for local browsing and Remix:
+Use `arsenal serve-dashboard` for local browsing and Remix; use the online app
+for server-backed editing, sharing and durable owner recovery.
 
-```bash
-arsenal serve-dashboard --host 0.0.0.0 --port 8123
-```
-
-`arsenal serve-dashboard` only serves the local dashboard, catalog, and media
-paths. It does not expose private reserve files such as `data/telegram.session`,
-`data/arsenal.sqlite`, run logs, exports, or remix drafts.
+The local server excludes `data/telegram.session`, `data/arsenal.sqlite`, run logs,
+exports and remix drafts from static serving. It has no owner-login boundary;
+use loopback for local work. Binding to `0.0.0.0` exposes it to reachable peers.
 
 For the hosted service, first follow the explicit owner provisioning steps in
 [the community runbook](deploy/community/README.md). API and worker startup
@@ -412,12 +414,8 @@ arsenal serve-online --host 0.0.0.0 --port 8000
 The production frontend path is loaded from `dashboard/arsenal-config.json` and
 calls `/api/*` endpoints at runtime.
 
-Avoid serving the whole reserve with a plain static server unless the machine
-and network are private:
-
-```bash
-python -m http.server 8123 --directory meme-arsenal-reserve
-```
+Do not serve the whole reserve with a general static server: it contains private
+database, session and log files.
 
 `arsenal serve-dashboard` serves local files and adds:
 
@@ -452,8 +450,8 @@ part of local `serve-dashboard` recovery.
 
 ## Remix
 
-Remix generation currently requires the Google provider because it uses Gemini
-image generation:
+Remix generation requires the effective Remix provider to be Google and a
+compatible Gemini image model. For example:
 
 ```bash
 AI_PROVIDER=google
@@ -464,7 +462,7 @@ REMIX_MODEL=gemini-3.1-flash-image
 Start the live dashboard:
 
 ```bash
-arsenal serve-dashboard --host 0.0.0.0 --port 8123
+arsenal serve-dashboard --host 127.0.0.1 --port 8123
 ```
 
 In the dashboard, choose two different source memes in the Remix panel. You can
@@ -568,11 +566,9 @@ static result bundle under:
 meme-arsenal-reserve/catalog/search-results/
 ```
 
-The dashboard uses these generated bundles to enrich the same search results list
-used by the gallery. Exact local matches stay visible, while semantic bundle hits
-can add related items and improve ranking. This keeps the archive portable and
-static. Very large archives may eventually want a dedicated vector index, but
-SQLite keeps V1 simple to run and back up.
+Generated bundles add related items to the local gallery search and can improve
+ranking while keeping exact text matches visible. The online gallery uses
+PostgreSQL text/prefix search; enabling embeddings does not make it semantic.
 
 ## Telegram Notes
 

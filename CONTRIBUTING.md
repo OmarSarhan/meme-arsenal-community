@@ -1,11 +1,10 @@
 # Contributing
 
-Meme Arsenal serves individuals running one private library. Contributions and
-ordinary bug reports belong in
-[meme-arsenal-community](https://github.com/OmarSarhan/meme-arsenal-community).
+Meme Arsenal serves individuals running one private library. Public contributions
+go to [meme-arsenal-community](https://github.com/OmarSarhan/meme-arsenal-community).
 Start with the
-[developer guide](docs/development.md) for installation, source map and checks. The full application is the online
-API-backed deployment; the SQLite/mock demo has fewer features.
+[developer guide](docs/development.md) for installation, source files and checks.
+The full application uses the online API; the SQLite/mock demo has fewer features.
 
 Open an issue describing a concrete use case or reproducible bug before a large
 change. Small fixes can go directly into a pull request. Include the behavior

@@ -1,7 +1,7 @@
 # Derived data and explicit refresh
 
-Reuse compatible metadata and vectors, or deliberately refresh selected work when
-settings change. Browsing existing descriptions does not itself request a refresh.
+Compatible metadata and vectors are reused. You can refresh selected work when
+settings change; browsing descriptions does not request a refresh.
 For an already configured archive, this explicitly paid example refreshes at most
 five eligible classifications:
 
@@ -15,16 +15,15 @@ before authorizing replacement. Existing manual metadata keeps authority.
 
 ## Common refresh tasks
 
-`classify --force` followed by `embed --force` explicitly refreshes the eligible archive
-and may incur provider charges. Without `--limit` these commands are unbounded.
-`classify --force --limit N` always selects the newest eligible batch: repeating it is
-not pagination. Embedding limits count distinct actionable items, and the two bounded
+`classify --force` followed by `embed --force` refreshes the eligible archive and may
+incur provider charges. Without `--limit` these commands are unbounded. Embedding
+limits count distinct actionable items, and the two bounded
 commands need not select identical sets. Pipeline limits count distinct messages and
 retain multiple actionable media items within selected messages.
 
-Known-stale work can run through already configured sync/recovery; unknown legacy
-identity needs manual force for paid replacement. See the reference below before
-changing settings. Classification and embedding batches need not match.
+Sync and recovery may process records known to be stale. Older records whose
+provider/input identity is unknown require explicit force before paid replacement.
+Read the reference below before changing settings.
 
 ## Optional operator style guidance
 

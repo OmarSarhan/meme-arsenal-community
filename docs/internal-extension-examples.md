@@ -1,8 +1,8 @@
 # Internal extension examples
 
-Start here when changing provider dispatch, local intake, or retained Remix
-requests. These are ordinary internal helpers: change callers and tests together.
-They are not a plugin registry or a published compatibility guarantee.
+Use these examples to change provider routing, folder import, or retained Remix
+requests. Update callers and tests together: these internal helpers have no
+published compatibility guarantee.
 
 Install the [contributor prerequisites](development.md#first-local-setup) first.
 Choose the example matching your change: A checks mixed-provider dispatch, B
@@ -161,13 +161,13 @@ requires initialized reserve/schema and a session factory. It owns fresh
 transactions and commits. Full source/output/database/derivative preflight belongs
 to `folder_import.preflight`, before layout/schema creation, not this helper.
 
-Immutable namespace/key identity is not content deduplication. Unchanged pending
-items can still enter bounded orchestration through its validated scope. Explicit
-empty IDs must never widen to all items. The bound counts items, not requests,
-retries or cost. Library visibility flags create neither a share grant, multi-owner
-isolation nor Telegram provenance. Use trusted stable roots; no adversarial
-filesystem or filesystem/database atomicity promise is made. Keep operational
-details in [source ingestion](source-ingestion.md) and
+Namespace and relative path identify an import; equal bytes do not merge items.
+Unchanged imports with pending work can still enter the bounded pipeline. An
+empty ID list must never select the whole library. Limits count items, not
+requests, retries or cost. Saved-library flags grant no public share or separate
+owner access and do not imply Telegram origin. Use trusted, stable directories;
+filesystem and database writes are not one atomic operation. See
+[source ingestion](source-ingestion.md) and
 [derived-data refresh](derived-data-refresh.md).
 
 ## C. Retained guidance, request evidence and private identity

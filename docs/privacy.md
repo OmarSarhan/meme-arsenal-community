@@ -12,11 +12,10 @@ Publishing its source does not publish an operator's reserve. The current online
 application relies on authentication supplied by a reverse proxy; its browser
 session cookie is not a login account. Use the authenticated
 [community deployment recipe](../deploy/community/README.md) and keep the
-application port unpublished. Accepted bounded private community evidence covers
-exact-image restore, restored app/worker activation and the development-schema
-012→013 rehearsal. See [tested identities and limits](release-preparation.md):
-this does not establish arbitrary historical upgrades, downgrades, power-loss
-recovery or a published supported release.
+application port unpublished. The [dated test evidence](release-preparation.md)
+covers exact-image restore, restored app/worker activation and development-schema
+012→013 recovery. It does not establish arbitrary historical upgrades,
+downgrades or power-loss recovery.
 
 ## What stays in the reserve
 
@@ -52,8 +51,8 @@ personal media. The project makes no provider-retention guarantee.
 
 ## Logs, retention, and sharing
 
-Choose logging/backup access as carefully as application access. Only put
-nonsecret prose in style guidance; providers receive it and private retained
+Restrict access to logs and backups as carefully as access to the app. Only put
+nonsecret text in style guidance; providers receive it and private retained
 requests/results and backups may contain it. See
 [retained guidance](derived-data-refresh.md#retained-guidance-and-identity) for
 identity, serializer exclusions and confidentiality limits.
@@ -68,9 +67,9 @@ Deleting an item from the active library does not erase existing backups or
 copies already sent to providers or other people.
 
 Saving to the private library does not publish. Sharing is disabled by default
-and requires explicit enablement and publication. Output-only capabilities do
-not authorize recipe/source disclosure; explicit recipe publication grants
-access to eligible approved source presentation and descriptions. See the
+and requires explicit enablement and publication. Sharing an output image does
+not share its recipe or sources. Publishing a recipe grants access to approved,
+eligible source previews and descriptions. See the
 [sharing guide](opt-in-sharing.md) for grants and independent source/recipe recall.
 
 Public share links deliberately disclose selected content. The public share
@@ -93,6 +92,6 @@ in its process; it is not a durable queue. Stopping the worker or local process 
 new dispatch but cannot cancel an in-flight provider request. Saving an already ready
 image does not regenerate it; optional classification and embeddings use current settings.
 Mock operations use deterministic local behavior for exploration and tests.
-It does not provide useful AI metadata or generate remix images. A fixture
+They do not provide useful AI metadata or generate remix images. A fixture
 import avoids Telegram but still uses the configured database and AI provider;
 set isolated storage and mock AI explicitly.

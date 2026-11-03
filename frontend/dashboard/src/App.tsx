@@ -1,3 +1,4 @@
+import { version } from "../package.json";
 import { useRemixSession, readRemixOpen, persistRemixOpen } from "./remixSession";
 import { usePlaybackDiagnostics } from "./playbackDiagnostics";
 import { asCatalogItem, asRemixJob, asUploadSaveResponse, asPublicShareState, apiErrorMessage, ApiRequestError } from "./api";
@@ -3236,7 +3237,7 @@ export default function App() {
         <button className="brand" type="button" onClick={resetToStart} aria-label="Reset Meme Arsenal">
           <img className="brandMark" src={arsenalMarkIcon} alt="" aria-hidden="true" />
           <div className="brandText">
-            <h1>{APP_NAME}</h1>
+            <h1>{APP_NAME} <small className="brandVersion">v{version}</small></h1>
             <span className="brandCount">{index ? `${total ?? items.length} items` : "Loading"}</span>
           </div>
         </button>

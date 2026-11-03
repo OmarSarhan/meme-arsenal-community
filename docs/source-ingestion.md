@@ -12,8 +12,7 @@ backup/recovery; this command is an external writer:
 arsenal import-folder /absolute/path/to/trusted-images --namespace personal-images
 ```
 
-Use an isolated writable reserve/database and a stable source containing only
-files intended for import. Expect copied originals and created/unchanged counts,
+Expect copied originals and created/unchanged counts,
 plus a private report under `data/run-logs`. Intake alone does not classify,
 export a catalog or build a dashboard. For a full owner app, initialize through
 the [community guide](../deploy/community/README.md#upload-first-setup) instead;

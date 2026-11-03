@@ -1,3 +1,10 @@
+Historical community verification
+
+These dated records describe earlier private development snapshots. Pending
+wording and test results belong to those snapshots, not the current release.
+Use README.md here for setup and ../../docs/release-preparation.md for the later
+evidence summary. Public source: https://github.com/OmarSarhan/meme-arsenal-community
+
 Later private documentation addendum — 2026-11-02
 The introductory pending guide/UI wording below is historical. Accepted later
 bounded private guide/UI and recovery evidence is indexed in

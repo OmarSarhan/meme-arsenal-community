@@ -1,10 +1,10 @@
 # Licensing and asset provenance
 
-The owner selected unrestricted reuse for this project on 2026-11-01. Original
-project code, documentation, and project-created assets are offered under
+Original project code, documentation, and project-created assets use
 [BSD Zero Clause (0BSD)](../LICENSE), to the extent the contributors hold rights
 in them. Attribution and publication of modifications are not conditions of this
-license. The canonical text is listed by [SPDX](https://spdx.org/licenses/0BSD.html)
+license. The owner selected it on 2026-11-01. The canonical text is listed by
+[SPDX](https://spdx.org/licenses/0BSD.html)
 and the [Open Source Initiative](https://opensource.org/license/0bsd).
 
 For example, when redistributing a built dashboard, include its generated

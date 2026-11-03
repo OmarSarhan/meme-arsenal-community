@@ -23,6 +23,21 @@ set -a
 source "$env_file_abs"
 set +a
 
+# Refuse a full media archive that could exhaust the shared application disk.
+# Uncompressed size is conservative because media is generally already compressed.
+reserve_path="${RESERVE_HOST_PATH:-}"
+if [[ -n "$reserve_path" && "$reserve_path" != /* ]]; then
+  reserve_path="$(realpath -m "$compose_dir/$reserve_path")"
+fi
+if [[ "${BACKUP_RESERVE:-1}" == "1" && -d "$reserve_path" ]]; then
+  reserve_bytes="$(du -sb "$reserve_path" | cut -f1)"
+  available_bytes="$(df -B1 --output=avail "$backup_dir_abs" | tail -1 | tr -d ' ')"
+  if (( available_bytes < reserve_bytes + 1073741824 )); then
+    echo "Insufficient backup capacity: reserve archive requires its source size plus 1 GiB headroom; use a larger backup destination or BACKUP_RESERVE=0 for database-only backup." >&2
+    exit 1
+  fi
+fi
+
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 out="$backup_dir_abs/meme_arsenal_${stamp}.dump"
 reserve_out="$backup_dir_abs/meme_arsenal_reserve_${stamp}.tar.gz"
